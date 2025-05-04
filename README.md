@@ -1,96 +1,40 @@
+# Stronova
 
-# 📚 Despliegue de una Aplicación Symfony y Angular con Docker Compose
-Este proyecto utiliza Docker y Docker Compose para desplegar una aplicación que incluye un backend Symfony, un frontend Angular y una base de datos PostgreSQL de manera rápida y sencilla.
+### 🏋️ Bienvenido a Stronova
 
----
+Stronova es un proyecto de aplicación web desarrollado como Trabajo de Fin de Grado, con el objetivo de revolucionar la gestión de entrenamientos en el ámbito fitness. La inspiración surge de mi experiencia personal como entusiasta del fitness, donde identifiqué la necesidad de una herramienta que integre y simplifique el seguimiento de entrenamientos, conectando de manera eficiente usuarios y entrenadores.
 
-## 🛠️ Requisitos Previos
-Antes de comenzar, asegúrate de tener instalados en tu sistema:
+## 🎯 Objetivo del Proyecto
+El principal objetivo de Stronova es crear una plataforma integral que facilite:
+- La gestión personalizada de entrenamientos.
+- El seguimiento del progreso físico.
+- La interacción entre usuarios y entrenadores.
 
-- [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
----
+## 💡 Motivación
+Durante mi formación, identifiqué la necesidad de una herramienta que:
+- Simplifique la planificación de entrenamientos
+- Ofrezca flexibilidad entre autoentrenamiento y seguimiento profesional
+- Proporcione métricas claras de progreso fitness
 
-## 🚀 Instalación y Puesta en Marcha
+## 🚀 Características Principales
+### - Roles:
+  - Administrador: Gestión global del sistema.
+  - Entrenador: Creación de planes personalizados.
+  - Usuario: Visualización de los entrenamientos propuestos y añadir observaciones.
 
-### 1️⃣ Clonar el repositorio
-Ejecuta el siguiente comando para clonar el proyecto:
-```bash
-git clone git@github.com:campus-CodeArts/Onboarding-SymfAngular.git
-cd Onboarding-SymfAngular
-```
+### - Funcionalidades claves:
+  - Creación de rutinas personalizadas.
+  - Seguimiento de progreso físico.
+  - Sistema de asignación de entrenadores.
+  - Registro detallado de ejercicios.
 
-### 2️⃣ Levantar los contenedores
-Para iniciar los servicios en segundo plano, ejecuta:
-```bash
-docker-compose up -d
-```
-📌 **Nota:** La primera vez que inicies los servicios, puede tardar unos minutos en configurarse completamente.
+## 🛠 Tecnologías Utilizadas
+- Backend: PHP + Symfony
+- Frontend: Angular + Bootstrap
+- Base de datos: PostgreSQL (DBeaver)
+- Otras herramientas: Docker, Figma
 
-### 3️⃣ Verificar que los contenedores están corriendo
-Comprueba el estado de los contenedores con:
-```bash
-docker ps
-```
-Deberías ver tres contenedores en ejecución: **PostgreSQL**, **Symfony (backend)** y **Angular (frontend)**.
-
-### 4️⃣ Acceder a la aplicación
-- **Frontend:** Abre la siguiente URL en tu navegador:
-  ```
-  http://localhost:4200
-  ```
-- **Backend (Symfony):** Puedes ver la salida de Symfony desde:
-  ```
-  http://localhost:8000
-  ```
-- **Base de datos PostgreSQL:** El contenedor de la base de datos está en el puerto 5432, aunque normalmente no es necesario acceder directamente a este servicio en un navegador.
-
----
-
-## 🔄 Detener y Reiniciar los Contenedores
-Si deseas detener los contenedores en ejecución:
-```bash
-docker-compose down
-```
-Para volver a iniciarlos:
-```bash
-docker-compose up -d
-```
-
----
-
-## 🧹 Eliminar los Contenedores y Datos Persistentes
-Si quieres eliminar los contenedores junto con los volúmenes y datos almacenados:
-```bash
-docker-compose down -v
-```
-⚠️ **Advertencia:** Esto eliminará todos los datos almacenados en la base de datos PostgreSQL.
-
----
-
-## 🎯 Notas Finales
-- Para ver los registros en tiempo real:
-  ```bash
-  docker-compose logs -f
-  ```
-
-Para más información sobre **Symfony**, **Angular** o **PostgreSQL**, consulta sus respectivas documentaciones oficiales.
-
-## Comandos útiles
-
-- Para acceder al contenedor del Frontend Angular:
-```
-  docker exec -it angular_frontend sh
-```
-
-- Para acceder al contenedor del Backend Symfony:
-```
-docker exec -it symfony_backend bash
-```
-- Si no tienes problemas de permisos para levantar un contenedor, prueba a ejecutar el siguiente comando:
-
-```
-sudo chmod 775 -R (contenedor_de_Symfony_o_Angular_frontend)
-Ej:
-sudo chmod 775 -R angular-frontend
-```
+## 🔮 Perspectivas Futuras
+Posibles mejoras y extensiones:
+- Módulo de nutrición
+- Análisis avanzado de progreso
