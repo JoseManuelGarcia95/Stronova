@@ -5,6 +5,7 @@ use App\Repository\UsuarioRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UsuarioRepository::class)] 
 class Usuario 
@@ -12,43 +13,55 @@ class Usuario
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column] 
+    #[Groups(['usuario:read', 'entrenador:read', 'rutina:read', 'resultado_entreno:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)] 
+    #[Groups(['usuario:read', 'entrenador:read', 'rutina:read', 'resultado_entreno:read'])]
     private ?string $nombre = null;
 
     #[ORM\Column(length: 255)] 
+    #[Groups(['usuario:read', 'entrenador:read', 'rutina:read', 'resultado_entreno:read'])]
     private ?string $apellidos = null;
 
     #[ORM\Column(length: 255)] 
+    #[Groups(['usuario:read', 'usuario:write'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)] 
+    #[Groups(['usuario:read', 'usuario:write'])]
     private ?string $genero = null;
 
     // Precision:5 es el número total de dígitos y Scale:2 es el número de decimales
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2, nullable: true)] 
+    #[Groups(['usuario:read', 'usuario:write'])]
     private ?float $altura = null;
 
     #[ORM\Column(type: 'decimal', precision: 6, scale: 2, nullable: true)] 
+    #[Groups(['usuario:read', 'usuario:write'])]
     private ?float $peso_inicial = null;
 
     #[ORM\Column(length: 255, nullable: true)] 
+    #[Groups(['usuario:read', 'usuario:write'])]
     private ?string $lesiones = null;
 
     #[ORM\Column(length: 255, nullable: true)] 
+    #[Groups(['usuario:read', 'usuario:write'])]
     private ?string $objetivo = null;
 
     // Relaciones con otras entidades
 
     #[ORM\ManyToOne(inversedBy: 'usuarios')]
     #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['usuario:read'])]
     private ?Entrenador $entrenador = null;
 
     #[ORM\OneToMany(mappedBy: 'usuario', targetEntity: Rutina::class, orphanRemoval: true)]
+    #[Groups(['usuario:read'])]
     private Collection $rutinas;
 
     #[ORM\OneToMany(mappedBy: 'usuario', targetEntity: ResultadoEntreno::class, orphanRemoval: true)]
+    #[Groups(['usuario:read'])]
     private Collection $resultadosEntrenos;
 
     public function __construct()
@@ -59,6 +72,8 @@ class Usuario
 
     // Getters y Setters
 
+    #[Groups(['usuario:read'])]
+    
     public function getId(): ?int
     {
         return $this->id;

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ResultadoEntrenoRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ResultadoEntrenoRepository::class)]
 class ResultadoEntreno
@@ -13,30 +14,38 @@ class ResultadoEntreno
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['resultado_entreno:read', 'usuario:read', 'rutina:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['resultado_entreno:read', 'resultado_entreno:write', 'usuario:read', 'rutina:read'])]
     private ?\DateTimeInterface $fecha = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['resultado_entreno:read', 'resultado_entreno:write', 'usuario:read', 'rutina:read'])]
     private ?int $duracion_minutos = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['resultado_entreno:read', 'resultado_entreno:write', 'usuario:read'])]
     private ?int $dificultad_percibida = null;
 
     #[ORM\Column(length: 1000, nullable: true)]
+    #[Groups(['resultado_entreno:read', 'resultado_entreno:write'])]
     private ?string $comentarios = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['resultado_entreno:read', 'resultado_entreno:write', 'usuario:read', 'rutina:read'])]
     private ?bool $completado = null;
 
     // Relaciones con otras entidades
     #[ORM\ManyToOne(inversedBy: 'resultadosEntrenos')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['resultado_entreno:read'])]
     private ?Usuario $usuario = null;
 
     #[ORM\ManyToOne(inversedBy: 'resultadosEntrenos')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['resultado_entreno:read'])]
     private ?Rutina $rutina = null;
 
     // Getters y Setters

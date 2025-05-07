@@ -6,6 +6,7 @@ use App\Repository\RutinaRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: RutinaRepository::class)]
 class Rutina
@@ -14,36 +15,46 @@ class Rutina
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['rutina:read', 'usuario:read', 'entrenador:read', 'resultado_entreno:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['rutina:read', 'rutina:write', 'usuario:read', 'entrenador:read', 'resultado_entreno:read'])]
     private ?string $nombre = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['rutina:read', 'rutina:write', 'usuario:read', 'entrenador:read'])]
     private ?string $tipo_rutina = null;
 
     #[ORM\Column]
+    #[Groups(['rutina:read', 'rutina:write'])]
     private ?int $series = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['rutina:read', 'rutina:write', 'usuario:read', 'entrenador:read'])]
     private ?string $categoria = null;
 
     #[ORM\Column(length: 1000, nullable: true)]
+    #[Groups(['rutina:read', 'rutina:write'])]
     private ?string $descripcion = null;
 
     // Relaciones con otras entidades
     #[ORM\ManyToOne(inversedBy: 'rutinasCreadas')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['rutina:read'])]
     private ?Entrenador $entrenador = null;
 
     #[ORM\ManyToOne(inversedBy: 'rutinas')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['rutina:read'])]
     private ?Usuario $usuario = null;
 
     #[ORM\OneToMany(mappedBy: 'rutina', targetEntity: RutinaEjercicio::class, orphanRemoval: true, cascade: ['persist'])]
+    #[Groups(['rutina:read'])]
     private Collection $rutinaEjercicios;
 
     #[ORM\OneToMany(mappedBy:'rutina', targetEntity: ResultadoEntreno::class)]
+    #[Groups(['rutina:read'])]
     private Collection $resultadosEntrenos;
 
     public function __construct()

@@ -6,6 +6,7 @@ use App\Repository\EjercicioRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: EjercicioRepository::class)]
 class Ejercicio
@@ -14,22 +15,28 @@ class Ejercicio
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['ejercicio:read', 'rutina_ejercicio:read', 'rutina:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['ejercicio:read', 'ejercicio:write', 'rutina_ejercicio:read', 'rutina:read'])]
     private ?string $nombre = null;
 
     #[ORM\Column(length: 1000)]
+    #[Groups(['ejercicio:read', 'ejercicio:write', 'rutina_ejercicio:read'])]
     private ?string $descripcion = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['ejercicio:read', 'ejercicio:write', 'rutina_ejercicio:read'])]
     private ?string $dificultad = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['ejercicio:read', 'ejercicio:write', 'rutina_ejercicio:read'])]
     private ?string $categoria = null;
 
     // Relaciones con otras entidades
     #[ORM\OneToMany(mappedBy: 'ejercicio', targetEntity: RutinaEjercicio::class, orphanRemoval: true)]
+    #[Groups(['ejercicio:read'])]
     private Collection $rutinaEjercicios;
 
     public function __construct()

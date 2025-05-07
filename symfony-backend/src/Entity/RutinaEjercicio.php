@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\RutinaEjercicioRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: RutinaEjercicioRepository::class)]
 class RutinaEjercicio
@@ -12,33 +13,41 @@ class RutinaEjercicio
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['rutina_ejercicio:read', 'rutina:read', 'ejercicio:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     private ?string $nombre = null;
 
     #[ORM\Column]
+    #[Groups(['rutina_ejercicio:read', 'rutina_ejercicio:write', 'rutina:read', 'ejercicio:read'])]
     private ?int $series = null;
 
     #[ORM\Column]
+    #[Groups(['rutina_ejercicio:read', 'rutina_ejercicio:write', 'rutina:read', 'ejercicio:read'])]
     private ?int $repeticiones = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['rutina_ejercicio:read', 'rutina_ejercicio:write', 'rutina:read', 'ejercicio:read'])]
     private ?int $descanso_segundos = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['rutina_ejercicio:read', 'rutina_ejercicio:write', 'rutina:read'])]
     private ?int $orden = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['rutina_ejercicio:read', 'rutina_ejercicio:write', 'rutina:read'])]
     private ?string $notas = null;
 
     // Relaciones con otras entidades
     #[ORM\ManyToOne(inversedBy: 'rutinaEjercicios')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['rutina_ejercicio:read', 'ejercicio:read'])]
     private ?Rutina $rutina = null;
 
     #[ORM\ManyToOne(inversedBy: 'rutinaEjercicios')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['rutina_ejercicio:read', 'rutina:read'])]
     private ?Ejercicio $ejercicio = null;
 
     // Getters y Setters
