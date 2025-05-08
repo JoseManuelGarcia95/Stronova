@@ -77,7 +77,15 @@ class RutinaEjercicioController extends ApiController
                 return new JsonResponse(['error' => 'Ejercicio no encontrado'], Response::HTTP_NOT_FOUND);
             }
             $rutinaEjercicio->setEjercicio($ejercicio);
+
+            $rutinaEjercicio->setNombre($data['nombre'] ?? $ejercicio->getNombre());
+        } else {
+            if (isset($data['nombre'])){
+                return new JsonResponse(['error' => 'El campo nombre es obligatorio'], Response::HTTP_NOT_FOUND);
+            }
+            $rutinaEjercicio->setNombre($data['nombre']);
         }
+    
 
         // Establecer atributos
         $rutinaEjercicio->setSeries($data['series'] ?? 0);
