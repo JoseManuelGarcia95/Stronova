@@ -95,7 +95,7 @@ class UsuarioController extends ApiController
     #[Route('/buscar/apellidos/{apellidos}', name: 'app_usuarios_buscar_apellidos', methods: ['GET'])]
     public function buscarPorApellidos(string $apellidos): JsonResponse
     {
-        $usuarios = $this->usuarioRepository->findByApellidos(['apellidos' => $apellidos]);
+        $usuarios = $this->usuarioRepository->findByApellidos($apellidos);
         $data = $this->serializer->serialize($usuarios, 'json', ['groups' => 'usuario:read']);
 
         return new JsonResponse($data, Response::HTTP_OK, [], true);
@@ -105,17 +105,7 @@ class UsuarioController extends ApiController
     #[Route('/buscar/objetivo/{objetivo}', name: 'app_usuarios_buscar_objetivo', methods: ['GET'])]
     public function buscarPorObjetivo(string $objetivo): JsonResponse
     {
-        $usuarios = $this->usuarioRepository->findByObjetivo(['objetivo' => $objetivo]);
-        $data = $this->serializer->serialize($usuarios, 'json', ['groups' => 'usuario:read']);
-
-        return new JsonResponse($data, Response::HTTP_OK, [], true);
-    }
-
-    // Obtener usuarios sin entrenador
-    #[Route('/sin-entrenador', name: 'app_usuarios_sin_entrenador', methods: ['GET'])]
-    public function usuariosSinEntrenador(): JsonResponse
-    {
-        $usuarios = $this->usuarioRepository->findSinEntrenador();
+        $usuarios = $this->usuarioRepository->findByObjetivo($objetivo);
         $data = $this->serializer->serialize($usuarios, 'json', ['groups' => 'usuario:read']);
 
         return new JsonResponse($data, Response::HTTP_OK, [], true);
