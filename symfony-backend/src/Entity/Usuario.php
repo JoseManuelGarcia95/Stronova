@@ -6,9 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+
 
 #[ORM\Entity(repositoryClass: UsuarioRepository::class)] 
-class Usuario 
+class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
 { // Atributos de la Entidad Usuario
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -24,9 +27,13 @@ class Usuario
     #[Groups(['usuario:read', 'entrenador:read', 'rutina:read', 'resultado_entreno:read'])]
     private ?string $apellidos = null;
 
-    #[ORM\Column(length: 255)] 
+    #[ORM\Column(length: 255, unique: true)] 
     #[Groups(['usuario:read', 'usuario:write'])]
     private ?string $email = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['usuario:write'])]
+    private ?string $password = null;
 
     #[ORM\Column(length: 255)] 
     #[Groups(['usuario:read', 'usuario:write'])]
@@ -108,6 +115,17 @@ class Usuario
     public function setEmail(string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
 
         return $this;
     }
@@ -233,5 +251,30 @@ class Usuario
         }
 
         return $this;
+    }
+
+    // Métodos de la interfaz UserInterface que devuelvan el rol de usuario
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function getUsername(): string
+    {
+        return (string) $this->email;
+    }
+    
+    public function eraseCredentials(): void
+    {
     }
 }

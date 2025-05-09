@@ -11,20 +11,25 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[Route('/api/usuarios')]
 class UsuarioController extends ApiController
 {
     private $usuarioRepository;
+    private UserPasswordHasherInterface $passwordHasher;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
         ValidatorInterface $validator,
-        UsuarioRepository $usuarioRepository
+        UsuarioRepository $usuarioRepository,
+        UserPasswordHasherInterface $passwordHasher
+
     ) {
         parent::__construct($entityManager, $serializer, $validator);
         $this->usuarioRepository = $usuarioRepository;
+        $this->passwordHasher = $passwordHasher;
     }
 
     // Obtener usuario por id
@@ -56,6 +61,14 @@ class UsuarioController extends ApiController
         $usuario->setApellidos($data['apellidos'] ?? null);
         $usuario->setEmail($data['email'] ?? null);
         $usuario->setGenero($data['genero'] ?? null);
+
+        if (isset($data['password'])) {
+            $hashedPassword = $this->passwordHasher->hashPassword(
+                $usuario, 
+                $data['password']
+            );
+            $usuario->setPassword($hashedPassword);
+        }
 
         if (isset($data['altura'])) {
             $usuario->setAltura($data['altura']);
@@ -108,6 +121,54 @@ class UsuarioController extends ApiController
         $usuarios = $this->usuarioRepository->findByObjetivo($objetivo);
         $data = $this->serializer->serialize($usuarios, 'json', ['groups' => 'usuario:read']);
 
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
+
+    // Modificar usuario
+    #[Route('/{id}', name: 'app_usuarios_update', methods: ['PUT'])]
+    public function update(Request $request, Usuario $usuario): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (isset($data['nombre'])) {
+            $usuario->setNombre($data['nombre']);
+        }
+        if (isset($data['apellidos'])) {
+            $usuario->setApellidos($data['apellidos']);
+        }
+        if (isset($data['email'])) {
+            $usuario->setEmail($data['email']);
+        }
+        if (isset($data['genero'])) {
+            $usuario->setGenero($data['genero']);
+        }
+        if (isset($data['password'])) {
+            $hashedPassword = $this->passwordHasher->hashPassword(
+                $usuario, 
+                $data['password']
+            );
+            $usuario->setPassword($hashedPassword);
+        }
+        if (isset($data['altura'])) {
+            $usuario->setAltura($data['altura']);
+        }
+        if (isset($data['peso_inicial'])) {
+            $usuario->setPesoInicial($data['peso_inicial']);
+        }
+        if (isset($data['lesiones'])) {
+            $usuario->setLesiones($data['lesiones']);
+        }
+        if (isset($data['objetivo'])) {
+            $usuario->setObjetivo($data['objetivo']);
+        }
+
+        $errors = $this->validator->validate($usuario);
+        if (count($errors) > 0) {
+            return $this->validationErrorResponse($errors);
+        }
+
+        $this->entityManager->flush();
+
+        $data = $this->serializer->serialize($usuario, 'json', ['groups' => 'usuario:read']);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 }
