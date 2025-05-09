@@ -145,7 +145,7 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->altura;
     }
-    public function setAltura(float $altura): static
+    public function setAltura(?float $altura): static
     {
         $this->altura = $altura;
 
@@ -156,7 +156,7 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->peso_inicial;
     }
-    public function setPesoInicial(float $peso_inicial): static
+    public function setPesoInicial(?float $peso_inicial): static
     {
         $this->peso_inicial = $peso_inicial;
 
@@ -167,7 +167,7 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->lesiones;
     }
-    public function setLesiones(string $lesiones): static
+    public function setLesiones(?string $lesiones): static
     {
         $this->lesiones = $lesiones;
 
@@ -178,7 +178,7 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->objetivo;
     }
-    public function setObjetivo(string $objetivo): static
+    public function setObjetivo(?string $objetivo): static
     {
         $this->objetivo = $objetivo;
 
@@ -189,7 +189,7 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->entrenador;
     }
-    public function setEntrenador(Entrenador $entrenador): static
+    public function setEntrenador(?Entrenador $entrenador): static
     {
         $this->entrenador = $entrenador;
 

@@ -171,4 +171,18 @@ class UsuarioController extends ApiController
         $data = $this->serializer->serialize($usuario, 'json', ['groups' => 'usuario:read']);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
+
+    // Obtener usuario sin entrenador
+    #[Route('/sin-entrenador', name: 'app_usuarios_sin_entrenador', methods: ['GET'])]
+    public function usuariosSinEntrenador(): JsonResponse
+    {
+        $usuariosSinEntrenador = $this->entityManager->getRepository(Usuario::class)
+            ->createQueryBuilder('u')
+            ->where('u.entrenador IS NULL')
+            ->getQuery()
+            ->getResult();
+
+        $data = $this->serializer->serialize($usuariosSinEntrenador, 'json', ['groups' => 'usuario:read']);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
 }

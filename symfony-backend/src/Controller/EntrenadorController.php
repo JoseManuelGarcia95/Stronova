@@ -11,20 +11,24 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[Route('/api/entrenadores')]
 class EntrenadorController extends ApiController
 {
     private $entrenadorRepository;
+    private UserPasswordHasherInterface $passwordHasher;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
         ValidatorInterface $validator,
-        EntrenadorRepository $entrenadorRepository
+        EntrenadorRepository $entrenadorRepository,
+        UserPasswordHasherInterface $passwordHasher
     ) {
         parent::__construct($entityManager, $serializer, $validator);
         $this->entrenadorRepository = $entrenadorRepository;
+        $this->passwordHasher = $passwordHasher;
     }
 
     // Obtener entrenador por id
@@ -55,6 +59,14 @@ class EntrenadorController extends ApiController
         $entrenador->setApellidos($data['apellidos'] ?? null);
         $entrenador->setEmail($data['email'] ?? null);
         
+        if (isset($data['password'])) {
+            $hashedPassword = $this->passwordHasher->hashPassword(
+                $entrenador, 
+                $data['password']
+            );
+            $entrenador->setPassword($hashedPassword);
+        }
+
         if (isset($data['especialidad'])) {
             $entrenador->setEspecialidad($data['especialidad']);
         }
@@ -88,6 +100,15 @@ class EntrenadorController extends ApiController
         if (isset($data['email'])) {
             $entrenador->setEmail($data['email']);
         }
+
+        if (isset($data['password'])) {
+            $hashedPassword = $this->passwordHasher->hashPassword(
+                $entrenador, 
+                $data['password']
+            );
+            $entrenador->setPassword($hashedPassword);
+        }
+
         if (isset($data['especialidad'])) {
             $entrenador->setEspecialidad($data['especialidad']);
         }
@@ -130,6 +151,57 @@ class EntrenadorController extends ApiController
         $entrenadores = $this->entrenadorRepository->findByEspecialidad($especialidad);
         $data = $this->serializer->serialize($entrenadores, 'json', ['groups' => 'entrenador:read']);
 
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
+
+    // Asignar usuario a entrenador
+    #[Route('/{id}/asignar-usuario/{usuarioId}', name: 'app_entrenadores_asignar_usuario', methods: ['PUT'])]
+    public function asignarUsuario(Entrenador $entrenador, int $usuarioId): JsonResponse
+    {
+        // Buscar usuario por ID
+        $usuario = $this->entityManager->getRepository(Usuario::class)->find($usuarioId);
+
+        if (!$usuario) {
+            return new JsonResponse(['error' => 'Usuario no encontrado'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Verificar si el usuario ya está asignado al entrenador
+        $entrenadorActual = $usuario->getEntrenador();
+
+        // Asignar el usuario al entrenador
+        $entrenador->addUsuario($usuario);
+
+        // Actualizar el número de clientes activos del entrenador
+        if ($entrenadorActual && $entrenadorActual !== $entrenador){
+            $entrenadorActual->actualizarContadorClientes();
+        }
+
+        $this->entityManager->flush();
+
+        $data = $this->serializer->serialize($entrenador, 'json', ['groups' => 'entrenador:read']);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
+
+    // Desasignar usuario de entrenador
+    #[Route('/{id}/desasignar-usuario/{usuarioId}', name: 'app_entrenadores_desasignar_usuario', methods: ['PUT'])]
+    public function desasignarUsuario(Entrenador $entrenador, int $usuarioId): JsonResponse
+    {
+        // Buscar usuario por ID
+        $usuario = $this->entityManager->getRepository(Usuario::class)->find($usuarioId);
+        if (!$usuario) {
+            return new JsonResponse(['error' => 'Usuario no encontrado'], Response::HTTP_NOT_FOUND);
+        }
+        // Verificar si el usuario ya está asignado al entrenador
+        if ($usuario->getEntrenador() !== $entrenador) {
+            return new JsonResponse(['error' => 'El usuario no está asignado a este entrenador'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Desasignar el usuario del entrenador
+        $entrenador->removeUsuario($usuario);
+
+        $this->entityManager->flush();
+
+        $data = $this->serializer->serialize($entrenador, 'json', ['groups' => 'entrenador:read']);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 }

@@ -7,9 +7,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: EntrenadorRepository::class)]
-class Entrenador
+class Entrenador implements UserInterface, PasswordAuthenticatedUserInterface
 { // Atributos de la Entidad Entrenador
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -28,6 +30,10 @@ class Entrenador
     #[ORM\Column(length: 255, unique: true)]
     #[Groups(['entrenador:read', 'entrenador:write'])]
     private ?string $email = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['entrenador:write'])]
+    private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['entrenador:read', 'entrenador:write'])]
@@ -90,6 +96,17 @@ class Entrenador
     public function setEmail(string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
 
         return $this;
     }
@@ -179,5 +196,30 @@ class Entrenador
     public function actualizarContadorClientes(): void
     {
         $this->clientes_activos = $this->usuarios->count();
+    }
+
+    // Métodos de la interfaz UserInterface
+    public function getRoles(): array
+    {
+        return ['ROLE_ENTRENADOR'];
+    }
+
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function getUsername(): string
+    {
+        return (string) $this->email;
+    }
+    
+    public function eraseCredentials(): void
+    {
     }
 }
