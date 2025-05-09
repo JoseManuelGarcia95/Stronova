@@ -102,8 +102,17 @@ class RutinaController extends ApiController
 
     // Actualizar una rutina
     #[Route('/{id}', name: 'app_rutinas_update', methods: ['PUT'])]
-    public function update(Request $request): JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
+
+        // Obtener la rutina
+        $rutina = $this->rutinaRepository->find($id);
+
+        // Verificar si la rutina existe
+        if (!$rutina) {
+            return new JsonResponse(['error' => 'Rutina no encontrada'], Response::HTTP_NOT_FOUND);
+        }
+        // Obtener los datos de la solicitud
         $data = json_decode($request->getContent(), true);
 
         if (isset($data['nombre'])) {
@@ -186,19 +195,19 @@ class RutinaController extends ApiController
     }
 
     // Buscar rutinas por entrenador
-    #[Route('/buscar/entrenador/{entrenadorId}', name: 'app_rutinas_buscar_entrenador', methods: ['GET'])]
-    public function buscarPorEntrenador(int $entrenadorId): JsonResponse
+    #[Route('/buscar/entrenador/{nombreEntrenador}', name: 'app_rutinas_buscar_entrenador', methods: ['GET'])]
+    public function buscarPorEntrenador(string $nombreEntrenador): JsonResponse
     {
-        $rutinas = $this->rutinaRepository->findByEntrenador($entrenadorId);
+        $rutinas = $this->rutinaRepository->findByEntrenador($nombreEntrenador);
         $data = $this->serializer->serialize($rutinas, 'json', ['groups' => 'rutina:read']);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 
     // Buscar rutinas por usuario
-    #[Route('/buscar/usuario/{usuarioId}', name: 'app_rutinas_buscar_usuario', methods: ['GET'])]
-    public function buscarPorUsuario(int $usuarioId): JsonResponse
+    #[Route('/buscar/usuario/{nombreUsuario}', name: 'app_rutinas_buscar_usuario', methods: ['GET'])]
+    public function buscarPorUsuario(string $nombreUsuario): JsonResponse
     {
-        $rutinas = $this->rutinaRepository->findByUsuario($usuarioId);
+        $rutinas = $this->rutinaRepository->findByUsuario($nombreUsuario);
         $data = $this->serializer->serialize($rutinas, 'json', ['groups' => 'rutina:read']);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }

@@ -2,39 +2,54 @@
 
 namespace App\Entity;
 
-use App\Repository\EntrenadoresRepository;
+use App\Repository\EntrenadorRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: EntrenadorRepository::class)]
-class Entrenador
+class Entrenador implements UserInterface, PasswordAuthenticatedUserInterface
 { // Atributos de la Entidad Entrenador
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['entrenador:read', 'usuario:read', 'rutina:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['entrenador:read', 'usuario:read', 'rutina:read'])]
     private ?string $nombre = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['entrenador:read', 'usuario:read', 'rutina:read'])]
     private ?string $apellidos = null;
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Groups(['entrenador:read', 'entrenador:write'])]
     private ?string $email = null;
 
+    #[ORM\Column(length: 255)]
+    #[Groups(['entrenador:write'])]
+    private ?string $password = null;
+
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['entrenador:read', 'entrenador:write'])]
     private ?string $especialidad = null;
 
     #[ORM\Column]
+    #[Groups(['entrenador:read'])]
     private ?int $clientes_activos = null;
 
     // Relaciones con otras entidades
     #[ORM\OneToMany(mappedBy:'entrenador', targetEntity: Usuario::class)]
+    #[Groups(['entrenador:read'])]
     private Collection $usuarios;
 
     #[ORM\OneToMany(mappedBy: 'entrenador', targetEntity: Rutina::class)]
+    #[Groups(['entrenador:read'])]
     private Collection $rutinasCreadas;
 
     public function __construct()
@@ -46,6 +61,7 @@ class Entrenador
     
     // Getters y Setters
 
+    #[Groups(['entrenador:read', 'usuario:read', 'rutina:read'])]
     public function getId(): ?int
     {
         return $this->id;
@@ -84,6 +100,17 @@ class Entrenador
         return $this;
     }
 
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
     public function getEspecialidad(): ?string
     {
         return $this->especialidad;
@@ -117,7 +144,7 @@ class Entrenador
     {
         if (!$this->usuarios->contains($usuario)) {
             $this->usuarios->add($usuario);
-            $usuario->setEntrenadores($this);
+            $usuario->setEntrenador($this);
             $this->actualizarContadorClientes();
         }
 
@@ -128,8 +155,8 @@ class Entrenador
     public function removeUsuario(Usuario $usuario): static
     {
         if ($this->usuarios->removeElement($usuario)) {
-            if ($usuario->getEntrenadores() === $this) {
-                $usuario->setEntrenadores(null);
+            if ($usuario->getEntrenador() === $this) {
+                $usuario->setEntrenador(null);
             }
             $this->actualizarContadorClientes();
         }
@@ -147,7 +174,7 @@ class Entrenador
     {
         if (!$this->rutinasCreadas->contains($rutina)) {
             $this->rutinasCreadas->add($rutina);
-            $rutina->setEntrenadores($this);
+            $rutina->setEntrenador($this);
         }
 
         return $this;
@@ -157,8 +184,8 @@ class Entrenador
     public function removeRutinasCreada(Rutina $rutina): static
     {
         if ($this->rutinasCreadas->removeElement($rutina)) {
-            if ($rutina->getEntrenadores() === $this) {
-                $rutina->setEntrenadores(null);
+            if ($rutina->getEntrenador() === $this) {
+                $rutina->setEntrenador(null);
             }
         }
 
@@ -169,5 +196,30 @@ class Entrenador
     public function actualizarContadorClientes(): void
     {
         $this->clientes_activos = $this->usuarios->count();
+    }
+
+    // Métodos de la interfaz UserInterface
+    public function getRoles(): array
+    {
+        return ['ROLE_ENTRENADOR'];
+    }
+
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function getUsername(): string
+    {
+        return (string) $this->email;
+    }
+    
+    public function eraseCredentials(): void
+    {
     }
 }
