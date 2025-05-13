@@ -37,4 +37,15 @@ class UsuarioRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    // Buscar usuarios sin entrenador asignado
+    public function findSinEntrenador(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.entrenador IS NULL')
+            ->orderBy('u.apellidos', 'ASC')
+            ->addOrderBy('u.nombre', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
