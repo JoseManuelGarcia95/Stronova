@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Entrenador;
+use App\Entity\Usuario;
 use App\Repository\EntrenadorRepository;
+use App\Repository\UsuarioRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,6 +19,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class EntrenadorController extends ApiController
 {
     private $entrenadorRepository;
+    private $usuarioRepository;
     private UserPasswordHasherInterface $passwordHasher;
 
     public function __construct(
@@ -24,11 +27,14 @@ class EntrenadorController extends ApiController
         SerializerInterface $serializer,
         ValidatorInterface $validator,
         EntrenadorRepository $entrenadorRepository,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHasher,
+        UsuarioRepository $usuarioRepository
+
     ) {
         parent::__construct($entityManager, $serializer, $validator);
         $this->entrenadorRepository = $entrenadorRepository;
         $this->passwordHasher = $passwordHasher;
+        $this->usuarioRepository = $usuarioRepository;
     }
 
     // Obtener entrenador por id
@@ -39,7 +45,14 @@ class EntrenadorController extends ApiController
         $data = $this->serializer->serialize($entrenadores, 'json', ['groups' => 'entrenador:read']);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
-
+    // Ver usuarios sin entrenador asignado
+    #[Route('/usuarios-sin-asignar', name: 'app_entrenador_usuarios_sin_asignar', methods: ['GET'])]
+    public function usuariosSinAsignar(): JsonResponse
+    {
+        $usuarios = $this->usuarioRepository->findSinEntrenador();
+        $data = $this->serializer->serialize($usuarios, 'json', ['groups' => 'usuario:read']);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
     // Obtener todos los entrenadores
     #[Route('/{id}', name: 'app_entrenadores_show', methods: ['GET'])]
     public function show(Entrenador $entrenador): JsonResponse
