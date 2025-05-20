@@ -3,15 +3,23 @@ module.exports = {
   content: [
     "./src/**/*.{html,ts}", // detecta los ficheros donde Tailwind debe buscar clases
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        primary: '#1D4ED8',    // Azul personalizado
-        secondary: '#9333EA',  // Morado personalizado
-        accent: '#F59E0B',     // Amarillo acento
-      },
-      fontFamily: {
-        sans: ['Poppins', 'sans-serif'], // Fuente predeterminada
+        primary: {
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+          950: '#172554',
+        },
       },
     },
   },
