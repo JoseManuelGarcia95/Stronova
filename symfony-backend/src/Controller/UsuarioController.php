@@ -185,4 +185,19 @@ class UsuarioController extends ApiController
         $data = $this->serializer->serialize($usuariosSinEntrenador, 'json', ['groups' => 'usuario:read']);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
+/**
+ * @Route("/api/usuarios/me", name="app_usuario_me", methods={"GET"})
+ */
+public function getCurrentUser(): JsonResponse
+    {
+    $user = $this->getUser();
+    if (!$user) {
+        return $this->json([
+            'message' => 'Usuario no autenticado'
+        ], Response::HTTP_UNAUTHORIZED);
+    }
+    
+    $data = $this->serializer->serialize($user, 'json', ['groups' => 'usuario:read']);
+    return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
 }
