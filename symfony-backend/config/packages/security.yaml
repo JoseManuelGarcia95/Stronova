@@ -35,6 +35,7 @@ security:
       provider: app_user_provider
   
   access_control:
-    - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }  # Usamos IS_AUTHENTICATED_ANONYMOUSLY en lugar de PUBLIC_ACCESS
-    - { path: ^/api/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/api/login, roles: PUBLIC_ACCESS }  # Usamos IS_AUTHENTICATED_ANONYMOUSLY en lugar de PUBLIC_ACCESS
+    - { path: ^/api/register, roles: PUBLIC_ACCESS }
+    - { path: ^/api/usuarios$, roles: PUBLIC_ACCESS, methods: [POST] }
     - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

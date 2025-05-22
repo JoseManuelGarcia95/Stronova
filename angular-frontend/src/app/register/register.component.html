@@ -1,0 +1,213 @@
+<div class="min-h-screen w-full bg-gradient-to-br from-blue-900 to-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full p-8 bg-white rounded-lg shadow-2xl border border-gray-200 transition-all duration-300 transform hover:-translate-y-1">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Stronova Project</h1>
+        <p class="text-gray-600 mt-2">Crea tu cuenta para comenzar tu entrenamiento</p>
+      </div>
+      
+      <div class="flex justify-center mb-6">
+        <svg class="w-20 h-20 text-blue-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+      
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Campos distribuidos en dos columnas para algunos datos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Nombre -->
+          <div class="space-y-1">
+            <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+            <input 
+              type="text" 
+              id="nombre" 
+              formControlName="nombre"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+              placeholder="Tu nombre">
+            <div *ngIf="getFieldError('nombre')" class="text-red-500 text-xs mt-1">
+              {{ getFieldError('nombre') }}
+            </div>
+          </div>
+          
+          <!-- Apellidos -->
+          <div class="space-y-1">
+            <label for="apellidos" class="block text-sm font-medium text-gray-700">Apellidos</label>
+            <input 
+              type="text" 
+              id="apellidos" 
+              formControlName="apellidos"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+              placeholder="Tus apellidos">
+            <div *ngIf="getFieldError('apellidos')" class="text-red-500 text-xs mt-1">
+              {{ getFieldError('apellidos') }}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Género con select estilizado -->
+        <div class="space-y-1">
+          <label for="genero" class="block text-sm font-medium text-gray-700">Género</label>
+          <select 
+            id="genero" 
+            formControlName="genero"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none bg-white">
+            <option value="" disabled>Selecciona</option>
+            <option value="masculino">Masculino</option>
+            <option value="femenino">Femenino</option>
+            <option value="otro">Otro</option>
+          </select>
+          <div *ngIf="getFieldError('genero')" class="text-red-500 text-xs mt-1">
+            {{ getFieldError('genero') }}
+          </div>
+        </div>
+        
+        <!-- Medidas en dos columnas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <label for="altura" class="block text-sm font-medium text-gray-700">Altura (cm)</label>
+            <input 
+              type="number" 
+              id="altura" 
+              formControlName="altura"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+              placeholder="170">
+            <div *ngIf="getFieldError('altura')" class="text-red-500 text-xs mt-1">
+              {{ getFieldError('altura') }}
+            </div>
+          </div>
+          
+          <div class="space-y-1">
+            <label for="peso_inicial" class="block text-sm font-medium text-gray-700">Peso inicial (kg)</label>
+            <input 
+              type="number" 
+              id="peso_inicial" 
+              formControlName="peso_inicial"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+              placeholder="70">
+            <div *ngIf="getFieldError('peso_inicial')" class="text-red-500 text-xs mt-1">
+              {{ getFieldError('peso_inicial') }}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Lesiones (textarea) -->
+        <div class="space-y-1">
+          <label for="lesiones" class="block text-sm font-medium text-gray-700">
+            Lesiones o condiciones médicas (opcional)
+          </label>
+          <textarea 
+            id="lesiones" 
+            formControlName="lesiones"
+            rows="2"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+            placeholder="Indica si tienes alguna lesión o condición médica relevante"></textarea>
+        </div>
+        
+        <!-- Objetivo con select estilizado -->
+        <div class="space-y-1">
+          <label for="objetivo" class="block text-sm font-medium text-gray-700">Objetivo principal</label>
+          <select 
+            id="objetivo" 
+            formControlName="objetivo"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none bg-white">
+            <option value="" disabled>Selecciona tu objetivo</option>
+            <option value="perdida_peso">Pérdida de peso</option>
+            <option value="ganancia_muscular">Ganancia muscular</option>
+            <option value="resistencia">Mejorar resistencia</option>
+            <option value="tonificacion">Tonificación</option>
+            <option value="bienestar">Bienestar general</option>
+          </select>
+          <div *ngIf="getFieldError('objetivo')" class="text-red-500 text-xs mt-1">
+            {{ getFieldError('objetivo') }}
+          </div>
+        </div>
+        
+        <!-- Email -->
+        <div class="space-y-1">
+          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+            placeholder="tu@email.com">
+          <div *ngIf="getFieldError('email')" class="text-red-500 text-xs mt-1">
+            {{ getFieldError('email') }}
+          </div>
+        </div>
+        
+        <!-- Contraseñas en dos columnas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+            <input 
+              type="password" 
+              id="password" 
+              formControlName="password"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+              placeholder="••••••">
+            <div *ngIf="getFieldError('password')" class="text-red-500 text-xs mt-1">
+              {{ getFieldError('password') }}
+            </div>
+          </div>
+          
+          <div class="space-y-1">
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirmar contraseña</label>
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              formControlName="confirmPassword"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+              placeholder="••••••">
+            <div *ngIf="passwordMismatch" class="text-red-500 text-xs mt-1">
+              Las contraseñas no coinciden
+            </div>
+          </div>
+        </div>
+        
+        <!-- Términos y condiciones con mejor estilo -->
+        <div class="flex items-start mt-4">
+          <div class="flex items-center h-5">
+            <input 
+              type="checkbox" 
+              id="terms" 
+              formControlName="terms"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="terms" class="font-medium text-gray-700">Acepto los <a href="#" class="text-blue-600 hover:underline">términos y condiciones</a></label>
+            <div *ngIf="getFieldError('terms')" class="text-red-500 text-xs mt-1">
+              {{ getFieldError('terms') }}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Botón de registro con mejor estilo -->
+        <div>
+          <button 
+            type="submit" 
+            [disabled]="isSubmitting" 
+            class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-all hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
+            <span *ngIf="!isSubmitting">Registrarse</span>
+            <span *ngIf="isSubmitting" class="flex items-center justify-center">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Procesando...
+            </span>
+          </button>
+        </div>
+        
+        <!-- Mensaje de error -->
+        <div *ngIf="registerError" class="p-3 bg-red-100 text-red-700 rounded-lg text-center text-sm">
+          {{ registerError }}
+        </div>
+      </form>
+  
+      <!-- Enlace para volver al login -->
+      <div class="mt-6 text-center text-sm">
+        <p>¿Ya tienes cuenta? <a routerLink="/login" class="text-blue-600 hover:text-blue-800 font-medium">Inicia sesión aquí</a></p>
+      </div>
+    </div>
+  </div>
+  
