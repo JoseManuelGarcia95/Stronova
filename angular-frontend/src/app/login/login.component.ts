@@ -26,8 +26,7 @@ export class LoginComponent {
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.isSubmitting = true;
-      // Aquí implementarías la lógica de autenticación real
-      // Por ahora, simulamos un login exitoso después de 1 segundo
+      // Implementar lógica del login
       setTimeout(() => {
         this.isSubmitting = false;
         this.router.navigate(['/dashboard']);
