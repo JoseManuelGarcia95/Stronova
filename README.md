@@ -18,7 +18,6 @@ Durante mi formación, identifiqué la necesidad de una herramienta que:
 
 ## 🚀 Características Principales
 ### - Roles:
-  - Administrador: Gestión global del sistema.
   - Entrenador: Creación de planes personalizados.
   - Usuario: Visualización de los entrenamientos propuestos y añadir observaciones.
 
@@ -30,9 +29,9 @@ Durante mi formación, identifiqué la necesidad de una herramienta que:
 
 ## 🛠 Tecnologías Utilizadas
 - Backend: PHP + Symfony
-- Frontend: Angular + Bootstrap
+- Frontend: Angular + Tailwind
 - Base de datos: PostgreSQL (DBeaver)
-- Otras herramientas: Docker, Figma
+- Otras herramientas: Docker, Figma, Postman, Swagger
 
 ## 🔮 Perspectivas Futuras
 Posibles mejoras y extensiones:
