@@ -119,4 +119,69 @@ class AuthController extends AbstractController
             'user' => $userData
         ], Response::HTTP_CREATED);
     }
+
+    /**
+     * @Route("/api/login", name="api_login", methods={"POST"})
+     */
+    public function login(Request $request): JsonResponse 
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!isset($data['email']) || !isset($data['password'])){
+            return $this->json([
+                'message' => 'Email y contraseña son requeridos'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Buscar primero en usuario
+        $usuario = $this->usuarioRepository->findOneBy(['email'=> $data['email']]);
+        $userType = 'client';
+        $user = $usuario;
+
+        // Si no es usuario, buscar en entrenadores
+        if (!$usuario) {
+            $entrenadorRepository = $this->entityManager->getRepository(\App\Entity\Entrenador::class);
+            $entrenador = $entrenadorRepository->findOneBy(['email' => $data['email']]);
+
+            if ($entrenador) {
+                $userType = 'trainer';
+                $user = $entrenador;
+            }
+        }
+
+        if (!$user) {
+            return $this->json([
+                'message' => 'Credenciales incorrectas'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if (!$this->passwordHasher->isPasswordValid($user, $data['password'])){
+            return $this->json([
+                'message' => 'Credenciales incorrectas'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+        $token = $this->JWTManager->create($user);
+
+        // Datos básicos del usuario
+        $userData = [
+            'id' => $user->getId(),
+            'nombre' => $user->getNombre(),
+            'apellidos' => $user->getApellidos(),
+            'email' => $user->getEmail(),
+            'type' => $user->getType()
+        ];
+
+        // Agregar campos especificos según el tipo de usuario
+        if ($userType === 'client') {
+            $userData['entrenador_id'] = $user->getEntrenador() ? $user->getEntrenador()->getId() : null;
+        } else {
+            $userData['especialidad'] = $user->getEspecialidad();
+            $userData['clientes_activos'] = $user->getClientesActivos();
+        }
+
+        return $this->json([
+            'message' => 'Login exitoso',
+            'token' => $token,
+            'user' => $userData
+        ]);
+    }
 }
