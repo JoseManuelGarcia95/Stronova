@@ -119,10 +119,11 @@ class AuthController extends AbstractController
         ], Response::HTTP_CREATED);
     }
 
-    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
+    #[Route('/api/login', name: 'api_login', methods: ['POST'])] // ✅ Cambiar de /** @Route */ a #[Route]
     public function login(Request $request): JsonResponse 
     {
         $data = json_decode($request->getContent(), true);
+        
         if (!isset($data['email']) || !isset($data['password'])){
             return $this->json([
                 'message' => 'Email y contraseña son requeridos'
@@ -136,7 +137,7 @@ class AuthController extends AbstractController
 
         // Si no es usuario, buscar en entrenadores
         if (!$usuario) {
-            $entrenadorRepository = $this->entityManager->getRepository(\App\Entity\Entrenador::class);
+            $entrenadorRepository = $this->entityManager->getRepository(Entrenador::class);
             $entrenador = $entrenadorRepository->findOneBy(['email' => $data['email']]);
 
             if ($entrenador) {
@@ -156,6 +157,7 @@ class AuthController extends AbstractController
                 'message' => 'Credenciales incorrectas'
             ], Response::HTTP_UNAUTHORIZED);
         }
+        
         $token = $this->JWTManager->create($user);
 
         // Datos básicos del usuario
@@ -167,12 +169,12 @@ class AuthController extends AbstractController
             'type' => $userType
         ];
 
-        // Agregar campos especificos según el tipo de usuario
+        // Agregar campos específicos según el tipo de usuario
         if ($userType === 'client') {
             $userData['entrenador_id'] = $user->getEntrenador() ? $user->getEntrenador()->getId() : null;
         } else {
-            $userData['especialidad'] = $user->getEspecialidad();
-            $userData['clientes_activos'] = $user->getClientesActivos();
+            $userData['especialidad'] = $user->getEspecialidad() ?? null;
+            $userData['clientes_activos'] = $user->getClientesActivos() ?? 0;
         }
 
         return $this->json([

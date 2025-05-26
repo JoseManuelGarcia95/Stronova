@@ -2,11 +2,16 @@ security:
   
   password_hashers:
     App\Entity\Usuario: 'auto' 
+    App\Entity\Entrenador: 'auto'
   
   providers:
     app_user_provider:
       entity:
         class: App\Entity\Usuario
+        property: email
+    app_entrenador_provider:
+      entity:
+        class: App\Entity\Entrenador
         property: email
   
   firewalls:
