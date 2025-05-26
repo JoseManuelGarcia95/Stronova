@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Usuario;
+use App\Entity\Entrenador;
 use App\Repository\UsuarioRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -40,9 +41,7 @@ class AuthController extends AbstractController
         $this->JWTManager = $JWTManager;
     }
 
-    /**
-     * @Route("/api/register", name="api_register", methods={"POST"})
-     */
+    #[Route('/api/register', name: 'api_register', methods: ['POST'])]
     public function register(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -120,9 +119,7 @@ class AuthController extends AbstractController
         ], Response::HTTP_CREATED);
     }
 
-    /**
-     * @Route("/api/login", name="api_login", methods={"POST"})
-     */
+    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
     public function login(Request $request): JsonResponse 
     {
         $data = json_decode($request->getContent(), true);
@@ -167,7 +164,7 @@ class AuthController extends AbstractController
             'nombre' => $user->getNombre(),
             'apellidos' => $user->getApellidos(),
             'email' => $user->getEmail(),
-            'type' => $user->getType()
+            'type' => $userType
         ];
 
         // Agregar campos especificos según el tipo de usuario

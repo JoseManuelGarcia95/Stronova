@@ -1,0 +1,36 @@
+<!-- src/app/trainer-dashboard/trainer-dashboard.component.html -->
+<div class="min-h-screen bg-gray-50 py-6 px-4">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Panel de Entrenador</h1>
+        <p class="mt-2 text-lg text-gray-600">
+          Bienvenido, {{ currentUser?.nombre }} {{ currentUser?.apellidos }}
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white shadow rounded-lg p-6">
+          <h3 class="text-lg font-medium text-gray-900">Clientes Activos</h3>
+          <p class="text-3xl font-bold text-blue-600">{{ currentUser?.clientes_activos || 0 }}</p>
+        </div>
+        
+        <div class="bg-white shadow rounded-lg p-6">
+          <h3 class="text-lg font-medium text-gray-900">Especialidad</h3>
+          <p class="text-xl text-gray-700">{{ currentUser?.especialidad || 'No definida' }}</p>
+        </div>
+        
+        <div class="bg-white shadow rounded-lg p-6">
+          <h3 class="text-lg font-medium text-gray-900">Estado</h3>
+          <p class="text-xl text-green-600">Activo</p>
+        </div>
+      </div>
+      
+      <div class="bg-white shadow rounded-lg p-6">
+        <button 
+          (click)="logout()"
+          class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </div>
