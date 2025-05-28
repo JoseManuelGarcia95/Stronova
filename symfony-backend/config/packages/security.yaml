@@ -1,13 +1,17 @@
 security:
-  # No usamos enable_authenticator_manager, ya que generó un error
   
   password_hashers:
-    App\Entity\Usuario: 'auto'  # Versión simplificada sin 'algorithm'
+    App\Entity\Usuario: 'auto' 
+    App\Entity\Entrenador: 'auto'
   
   providers:
     app_user_provider:
       entity:
         class: App\Entity\Usuario
+        property: email
+    app_entrenador_provider:
+      entity:
+        class: App\Entity\Entrenador
         property: email
   
   firewalls:
@@ -35,7 +39,7 @@ security:
       provider: app_user_provider
   
   access_control:
-    - { path: ^/api/login, roles: PUBLIC_ACCESS }  # Usamos IS_AUTHENTICATED_ANONYMOUSLY en lugar de PUBLIC_ACCESS
+    - { path: ^/api/login, roles: PUBLIC_ACCESS } 
     - { path: ^/api/register, roles: PUBLIC_ACCESS }
     - { path: ^/api/usuarios$, roles: PUBLIC_ACCESS, methods: [POST] }
     - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

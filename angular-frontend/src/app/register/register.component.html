@@ -12,7 +12,7 @@
       </div>
       
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
-        <!-- Campos distribuidos en dos columnas para algunos datos -->
+        <!-- Campos distribuidos en dos columnas para datos menores -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Nombre -->
           <div class="space-y-1">
@@ -43,7 +43,7 @@
           </div>
         </div>
         
-        <!-- Género con select estilizado -->
+        <!-- Género con opciones -->
         <div class="space-y-1">
           <label for="genero" class="block text-sm font-medium text-gray-700">Género</label>
           <select 
@@ -60,7 +60,7 @@
           </div>
         </div>
         
-        <!-- Medidas en dos columnas -->
+        <!-- Medidas en dos columnas como nombre y apellidos-->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-1">
             <label for="altura" class="block text-sm font-medium text-gray-700">Altura (cm)</label>
@@ -89,7 +89,7 @@
           </div>
         </div>
         
-        <!-- Lesiones (textarea) -->
+        <!-- Lesiones -->
         <div class="space-y-1">
           <label for="lesiones" class="block text-sm font-medium text-gray-700">
             Lesiones o condiciones médicas (opcional)
@@ -102,7 +102,7 @@
             placeholder="Indica si tienes alguna lesión o condición médica relevante"></textarea>
         </div>
         
-        <!-- Objetivo con select estilizado -->
+        <!-- Objetivo en opciones -->
         <div class="space-y-1">
           <label for="objetivo" class="block text-sm font-medium text-gray-700">Objetivo principal</label>
           <select 
@@ -135,7 +135,7 @@
           </div>
         </div>
         
-        <!-- Contraseñas en dos columnas -->
+        <!-- Contraseñas en dos columnas para verificación -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-1">
             <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
@@ -164,7 +164,7 @@
           </div>
         </div>
         
-        <!-- Términos y condiciones con mejor estilo -->
+        <!-- CheckBox Términos y condiciones-->
         <div class="flex items-start mt-4">
           <div class="flex items-center h-5">
             <input 
@@ -181,7 +181,7 @@
           </div>
         </div>
         
-        <!-- Botón de registro con mejor estilo -->
+        <!-- Botón de registro -->
         <div>
           <button 
             type="submit" 

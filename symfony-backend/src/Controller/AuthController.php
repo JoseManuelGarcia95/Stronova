@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Usuario;
+use App\Entity\Entrenador;
 use App\Repository\UsuarioRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -40,9 +41,7 @@ class AuthController extends AbstractController
         $this->JWTManager = $JWTManager;
     }
 
-    /**
-     * @Route("/api/register", name="api_register", methods={"POST"})
-     */
+    #[Route('/api/register', name: 'api_register', methods: ['POST'])]
     public function register(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -118,5 +117,70 @@ class AuthController extends AbstractController
             'token' => $token,
             'user' => $userData
         ], Response::HTTP_CREATED);
+    }
+
+    #[Route('/api/login', name: 'api_login', methods: ['POST'])] // ✅ Cambiar de /** @Route */ a #[Route]
+    public function login(Request $request): JsonResponse 
+    {
+        $data = json_decode($request->getContent(), true);
+        
+        if (!isset($data['email']) || !isset($data['password'])){
+            return $this->json([
+                'message' => 'Email y contraseña son requeridos'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Buscar primero en usuario
+        $usuario = $this->usuarioRepository->findOneBy(['email'=> $data['email']]);
+        $userType = 'client';
+        $user = $usuario;
+
+        // Si no es usuario, buscar en entrenadores
+        if (!$usuario) {
+            $entrenadorRepository = $this->entityManager->getRepository(Entrenador::class);
+            $entrenador = $entrenadorRepository->findOneBy(['email' => $data['email']]);
+
+            if ($entrenador) {
+                $userType = 'trainer';
+                $user = $entrenador;
+            }
+        }
+
+        if (!$user) {
+            return $this->json([
+                'message' => 'Credenciales incorrectas'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if (!$this->passwordHasher->isPasswordValid($user, $data['password'])){
+            return $this->json([
+                'message' => 'Credenciales incorrectas'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+        
+        $token = $this->JWTManager->create($user);
+
+        // Datos básicos del usuario
+        $userData = [
+            'id' => $user->getId(),
+            'nombre' => $user->getNombre(),
+            'apellidos' => $user->getApellidos(),
+            'email' => $user->getEmail(),
+            'type' => $userType
+        ];
+
+        // Agregar campos específicos según el tipo de usuario
+        if ($userType === 'client') {
+            $userData['entrenador_id'] = $user->getEntrenador() ? $user->getEntrenador()->getId() : null;
+        } else {
+            $userData['especialidad'] = $user->getEspecialidad() ?? null;
+            $userData['clientes_activos'] = $user->getClientesActivos() ?? 0;
+        }
+
+        return $this->json([
+            'message' => 'Login exitoso',
+            'token' => $token,
+            'user' => $userData
+        ]);
     }
 }
