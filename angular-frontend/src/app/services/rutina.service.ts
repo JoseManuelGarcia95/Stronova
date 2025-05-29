@@ -58,7 +58,7 @@ export class RutinaService {
 
     // Obtención de las rutinas por usuario
     getUserRoutineByName(nombreUsuario: string): Observable<Rutina[]> {
-        return this.http.get<Rutina[]>(`${this.apiUrl}/rutinas/${nombreUsuario}`);
+        return this.http.get<Rutina[]>(`${this.apiUrl}/rutinas/buscar/usuario/${nombreUsuario}`);
     }
 
     // Obtención de las rutinas por ID
