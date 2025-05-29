@@ -22,6 +22,11 @@ export const routes: Routes = [
         canActivate: [ClientGuard]
     }, 
     {
+        path: 'rutina-detalle/:id',
+        loadComponent: () => import('./components/rutina-detalle/rutina-detalle.component').then(m => m.RutinaDetalleComponent),
+        canActivate: [ClientGuard]
+    }, 
+    {
         path: '', 
         redirectTo: '/login',
         pathMatch: 'full'

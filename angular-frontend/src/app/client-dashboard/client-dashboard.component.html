@@ -3,10 +3,10 @@
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-gray-900">Mi Panel Personal</h1>
       <p class="mt-2 text-lg text-gray-600">
-        Hola, {{ currentUser?.nombre }} {{ currentUser?.apellidos }}
+        Hola, {{ currentUser?.nombre || '' }} {{ currentUser?.apellidos || '' }}
       </p>
     </div>
-    
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
       <div class="bg-white shadow rounded-lg p-6">
         <h3 class="text-lg font-medium text-gray-900">Mi Entrenador</h3>
@@ -14,17 +14,227 @@
           {{ currentUser?.entrenador_id ? 'Asignado' : 'Sin asignar' }}
         </p>
       </div>
-      
       <div class="bg-white shadow rounded-lg p-6">
         <h3 class="text-lg font-medium text-gray-900">Estado</h3>
         <p class="text-xl text-green-600">Activo</p>
       </div>
     </div>
-    
+
+    <!-- Nueva Sección de Rutinas -->
+    <div class="bg-white shadow rounded-lg p-6 mb-8">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-semibold text-gray-900">Mis Rutinas</h3>
+        <button 
+          (click)="loadUserData()"
+          class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+          Actualizar
+        </button>
+      </div>
+      
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+        <p class="mt-2 text-gray-500">Cargando rutinas...</p>
+      </div>
+
+      <!-- Si no hay rutinas asignadas -->
+      <div *ngIf="!loading && (!assignedRoutines || assignedRoutines.length === 0)" class="text-center py-8">
+        <div class="text-gray-400 mb-4">
+          <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </div>
+        <p class="text-gray-500">No tienes rutinas asignadas por el momento</p>
+        <p class="text-sm text-gray-400 mt-2">Contacta con tu entrenador para que te asigne rutinas</p>
+      </div>
+
+      <!-- Lista de rutinas asignadas -->
+      <div *ngIf="!loading && assignedRoutines && assignedRoutines.length > 0" class="space-y-4">
+        <div *ngFor="let routine of assignedRoutines" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <h4 class="text-lg font-medium text-gray-900 hover:text-blue-600 cursor-pointer transition-colors"
+                  (click)="verDetalleRutina(routine.id)">
+                {{ routine?.nombre || 'Sin nombre' }}
+              </h4>
+              <p class="text-sm text-gray-600">{{ routine?.descripcion || 'Sin descripción' }}</p>
+              <div class="flex space-x-2 mt-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  {{ routine?.tipo_rutina || 'Sin tipo' }}
+                </span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                  {{ routine?.categoria || 'Sin categoría' }}
+                </span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  {{ routine?.series || 0 }} series
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ejercicios de la rutina - Vista previa -->
+          <div *ngIf="routine?.rutinaEjercicios && routine.rutinaEjercicios.length > 0" class="bg-gray-50 rounded-lg p-4 mb-4">
+            <div class="flex justify-between items-center mb-2">
+              <h5 class="font-medium text-gray-700">Ejercicios ({{ routine.rutinaEjercicios.length }}):</h5>
+              <button 
+                (click)="verDetalleRutina(routine.id)"
+                class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
+                Ver detalles completos →
+              </button>
+            </div>
+            <div class="space-y-2">
+              <!-- Mostrar solo los primeros 3 ejercicios como preview -->
+              <div *ngFor="let rutinaEjercicio of routine.rutinaEjercicios.slice(0, 3)" 
+                  class="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
+                <div>
+                  <span class="text-gray-800 font-medium">
+                    {{ rutinaEjercicio?.ejercicio?.nombre || rutinaEjercicio?.nombre || 'Ejercicio sin nombre' }}
+                  </span>
+                  <p *ngIf="rutinaEjercicio?.notas" class="text-xs text-gray-500">{{ rutinaEjercicio.notas }}</p>
+                </div>
+                <div class="text-right">
+                  <span class="text-sm text-gray-600">
+                    {{ rutinaEjercicio?.series || 0 }} series × {{ rutinaEjercicio?.repeticiones || 0 }} reps
+                  </span>
+                  <p class="text-xs text-gray-500">
+                    Descanso: {{ formatTime(rutinaEjercicio?.descanso_segundos) }}
+                  </p>
+                </div>
+              </div>
+    <!-- Indicador si hay más ejercicios -->
+    <div *ngIf="routine.rutinaEjercicios.length > 3" 
+         class="text-center py-2 text-sm text-gray-500">
+      Y {{ routine.rutinaEjercicios.length - 3 }} ejercicio(s) más...
+    </div>
+  </div>
+</div>
+
+          <!-- Estados de la rutina -->
+          <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+              <span [class]="getStatusClass(!!routine?.resultado_entreno, routine?.resultado_entreno?.completado || false)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                {{ getStatusText(!!routine?.resultado_entreno, routine?.resultado_entreno?.completado || false) }}
+              </span>
+              <span *ngIf="routine.resultado_entreno?.fecha" class="text-sm text-gray-500">
+                Realizado: {{ formatDate(routine?.resultado_entreno?.fecha) }}
+              </span>
+              <span *ngIf="routine.resultado_entreno?.duracion_minutos" class="text-sm text-gray-500">
+                Duración: {{ routine?.resultado_entreno?.duracion_minutos }} min
+              </span>
+              <span *ngIf="routine.resultado_entreno?.dificultad_percibida" class="text-sm text-gray-500">
+                Dificultad: {{ routine?.resultado_entreno?.dificultad_percibida }}/5
+              </span>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="flex space-x-2">
+              <button 
+                *ngIf="!routine.resultado_entreno"
+                (click)="markAsCompleted(routine)"
+                class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors">
+                Completar Rutina
+              </button>
+              <button 
+                (click)="verDetalleRutina(routine.id)"
+                class="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors">
+                Ver Detalle
+              </button>
+              <button 
+                *ngIf="routine.resultado_entreno"
+                (click)="openFeedbackModal(routine)"
+                class="px-3 py-1 bg-blue-600 text-white text-white text-sm rounded hover:bg-blue-700 transition-colors">
+                {{ routine?.resultado_entreno?.comentarios ? 'Ver/Editar Feedback' : 'Enviar Feedback' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Feedback -->
+    <div *ngIf="showFeedbackModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" (click)="closeFeedbackModal()">
+      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white" (click)="$event.stopPropagation()">
+        <div class="mt-3">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">
+            Feedback - {{ selectedRoutine?.nombre }}
+          </h3>
+          
+          <form (ngSubmit)="submitFeedback()" #feedbackForm="ngForm">
+            <!-- Duración del entrenamiento -->
+            <div class="mb-4">
+              <label for="duracion" class="block text-sm font-medium text-gray-700 mb-2">
+                Duración del entrenamiento (minutos) *
+              </label>
+              <input
+                type="number"
+                id="duracion"
+                [(ngModel)]="feedback.duracion_minutos"
+                name="duracion"
+                min="1"
+                max="300"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ej: 45">
+            </div>
+
+            <!-- Calificación de dificultad -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Dificultad percibida (1-5) *
+              </label>
+              <div class="flex space-x-2">
+                <button 
+                  *ngFor="let level of [1,2,3,4,5]; let i = index"
+                  type="button"
+                  (click)="setDifficulty(level)"
+                  [class]="'px-3 py-1 text-sm rounded transition-colors ' + (feedback.dificultad_percibida === level ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')">
+                  {{ level }}
+                </button>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">
+                {{ difficultyLevels[(feedback.dificultad_percibida || 1) - 1] }}
+              </p>
+            </div>
+
+            <!-- Comentarios -->
+            <div class="mb-4">
+              <label for="comentarios" class="block text-sm font-medium text-gray-700 mb-2">
+                Comentarios adicionales
+              </label>
+              <textarea
+                id="comentarios"
+                [(ngModel)]="feedback.comentarios"
+                name="comentarios"
+                rows="4"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="¿Cómo te sentiste durante el entrenamiento? ¿Algún ejercicio fue particularmente difícil?">
+              </textarea>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex justify-end space-x-2">
+              <button 
+                type="button"
+                (click)="closeFeedbackModal()"
+                class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors">
+                Cancelar
+              </button>
+              <button 
+                type="submit"
+                [disabled]="!feedback.dificultad_percibida || !feedback.duracion_minutos"
+                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 transition-colors">
+                {{ feedback.id ? 'Actualizar' : 'Enviar' }} Feedback
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <div class="bg-white shadow rounded-lg p-6">
-      <button 
+      <button
         (click)="logout()"
-        class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+        class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
         Cerrar Sesión
       </button>
     </div>
