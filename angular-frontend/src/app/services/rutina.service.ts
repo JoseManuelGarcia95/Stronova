@@ -33,7 +33,7 @@ export interface Rutina {
     series: number;
     categoria: string;
     descripcion: string;
-    ejercicios: RutinaEjercicio[];
+    rutinaEjercicios: RutinaEjercicio[];
     resultado_entreno?: ResultadoEntreno;
 }
 
@@ -63,6 +63,11 @@ export class RutinaService {
 
     // Obtención de las rutinas por ID
     getRoutineById(rutinaId: number): Observable<Rutina> {
+        return this.http.get<Rutina>(`${this.apiUrl}/rutinas/${rutinaId}`);
+    }
+
+    // Obtener las rutinas con los ejercicios
+    getRutinaById(rutinaId: number): Observable<Rutina> {
         return this.http.get<Rutina>(`${this.apiUrl}/rutinas/${rutinaId}`);
     }
 

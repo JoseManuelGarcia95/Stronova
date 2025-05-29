@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { Rutina, RutinaService, ResultadoEntreno} from '../services/rutina.service';
 import { CommonModule } from '@angular/common';
@@ -28,7 +29,8 @@ export class ClientDashboardComponent implements OnInit{
 
   constructor(
     private authService: AuthService,
-    private rutinaService: RutinaService
+    private rutinaService: RutinaService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -36,6 +38,10 @@ export class ClientDashboardComponent implements OnInit{
     if (this.currentUser?.nombre) {
       this.loadUserData();
     }
+  }
+
+  verDetalleRutina(rutinaId: number): void {
+    this.router.navigate(['/rutina-detalle', rutinaId]);
   }
 
   loadUserData(): void {

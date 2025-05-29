@@ -1,0 +1,163 @@
+<div class="min-h-screen bg-gray-50 py-6 px-4">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header con botón de regreso -->
+      <div class="mb-6">
+        <button 
+          (click)="volver()"
+          class="flex items-center text-blue-600 hover:text-blue-800 mb-4 transition-colors">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Volver a Mis Rutinas
+        </button>
+      </div>
+  
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p class="mt-4 text-gray-500">Cargando rutina...</p>
+      </div>
+  
+      <!-- Error -->
+      <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+        <div class="text-red-400 mb-4">
+          <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.694-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <p class="text-red-700 font-medium">{{ error }}</p>
+        <button 
+          (click)="cargarRutina()"
+          class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+          Reintentar
+        </button>
+      </div>
+  
+      <!-- Contenido de la rutina -->
+      <div *ngIf="!loading && !error && rutina">
+        <!-- Información principal de la rutina -->
+        <div class="bg-white shadow rounded-lg p-6 mb-6">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ rutina.nombre }}</h1>
+              <p class="text-lg text-gray-600 mb-4">{{ rutina.descripcion }}</p>
+              
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                  {{ rutina.tipo_rutina }}
+                </span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                  {{ rutina.categoria }}
+                </span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                  {{ rutina.series }} series totales
+                </span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
+                  {{ ejerciciosOrdenados.length }} ejercicios
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Lista de ejercicios -->
+        <div class="space-y-4">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Ejercicios de la Rutina</h2>
+          
+          <div *ngFor="let rutinaEjercicio of ejerciciosOrdenados; let i = index" 
+               class="bg-white shadow rounded-lg p-6 hover:shadow-md transition-shadow">
+            
+            <!-- Número del ejercicio -->
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                  {{ i + 1 }}
+                </div>
+              </div>
+              
+              <div class="flex-1 min-w-0">
+                <!-- Nombre y descripción del ejercicio -->
+                <div class="mb-4">
+                  <h3 class="text-xl font-semibold text-gray-900 mb-2">
+                    {{ rutinaEjercicio?.ejercicio?.nombre || rutinaEjercicio.nombre || 'Ejercicio sin nombre' }}
+                  </h3>
+                  <p *ngIf="rutinaEjercicio.ejercicio?.descripcion" 
+                     class="text-gray-600 mb-3">
+                    {{ rutinaEjercicio.ejercicio.descripcion }}
+                  </p>
+                  
+                  <!-- Badges de categoría y dificultad -->
+                  <div class="flex flex-wrap gap-2 mb-3">
+                    <span *ngIf="rutinaEjercicio.ejercicio?.categoria"
+                          class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                      {{ rutinaEjercicio.ejercicio.categoria }}
+                    </span>
+                    <span *ngIf="rutinaEjercicio.ejercicio?.dificultad"
+                          [class]="getDificultadClass(rutinaEjercicio.ejercicio.dificultad)"
+                          class="inline-flex items-center px-2 py-1 rounded text-xs font-medium">
+                      {{ rutinaEjercicio.ejercicio.dificultad }}
+                    </span>
+                  </div>
+                </div>
+                
+                <!-- Información de entrenamiento -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                  <div class="bg-blue-50 p-3 rounded-lg">
+                    <div class="text-2xl font-bold text-blue-600">{{ rutinaEjercicio.series }}</div>
+                    <div class="text-sm text-blue-600 font-medium">Series</div>
+                  </div>
+                  <div class="bg-green-50 p-3 rounded-lg">
+                    <div class="text-2xl font-bold text-green-600">{{ rutinaEjercicio.repeticiones }}</div>
+                    <div class="text-sm text-green-600 font-medium">Repeticiones</div>
+                  </div>
+                  <div class="bg-orange-50 p-3 rounded-lg">
+                    <div class="text-2xl font-bold text-orange-600">{{ formatTime(rutinaEjercicio.descanso_segundos) }}</div>
+                    <div class="text-sm text-orange-600 font-medium">Descanso</div>
+                  </div>
+                </div>
+                
+                <!-- Notas especiales -->
+                <div *ngIf="rutinaEjercicio.notas" 
+                     class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm text-yellow-700 font-medium">Notas importantes:</p>
+                      <p class="text-sm text-yellow-700">{{ rutinaEjercicio.notas }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Resumen final -->
+        <div class="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Resumen del Entrenamiento</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div>
+              <div class="text-2xl font-bold text-blue-600">{{ ejerciciosOrdenados.length }}</div>
+              <div class="text-sm text-gray-600">Ejercicios</div>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-green-600">{{ getTotalSeries() }}</div>
+              <div class="text-sm text-gray-600">Series totales</div>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-purple-600">{{ getTiempoEstimado() }}</div>
+              <div class="text-sm text-gray-600">Tiempo estimado</div>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-orange-600">{{ getDificultadPromedio() }}</div>
+              <div class="text-sm text-gray-600">Dificultad</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
