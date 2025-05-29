@@ -33,13 +33,13 @@ export class ClientDashboardComponent implements OnInit{
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
-    if (this.currentUser && this.currentUser.nombre) {
+    if (this.currentUser?.nombre) {
       this.loadUserData();
     }
   }
 
   loadUserData(): void {
-    if (!this.currentUser || !this.currentUser.nombre) {
+    if (!this.currentUser?.nombre) {
       console.error('Usuario no válido para cargar datos');
       return;
     }
@@ -71,6 +71,7 @@ export class ClientDashboardComponent implements OnInit{
   }
 
   loadRoutinesOnly(): void {
+    if(!this.currentUser?.nombre) return;
     this.rutinaService.getUserRoutineByName(this.currentUser.nombre).subscribe({
       next: (rutinas) => {
         this.assignedRoutines = rutinas;
@@ -98,13 +99,13 @@ export class ClientDashboardComponent implements OnInit{
   }
 
   markAsCompleted(rutina: Rutina): void {
-    if (!this.currentUser || !this.currentUser.id || !rutina || !rutina.id) {
+    if (!this.currentUser?.id || !rutina?.id) {
       console.error('Datos insuficientes para marcar rutina como completada');
       alert('Error: Datos de usuario o rutina no válidos');
       return;
     }
     const resultado: Partial<ResultadoEntreno> = {
-      usuario_id: this.currentUser.id,
+      usuario_id: this.currentUser?.id,
       rutina_id: rutina.id,
       fecha: new Date(),
       completado: true,
@@ -135,7 +136,7 @@ export class ClientDashboardComponent implements OnInit{
       this.feedback = {
         id: rutina.resultado_entreno.id,
         rutina_id: rutina.id,
-        usuario_id: this.currentUser.id,
+        usuario_id: this.currentUser?.id,
         dificultad_percibida: rutina.resultado_entreno.dificultad_percibida,
         comentarios: rutina.resultado_entreno.comentarios,
         duracion_minutos: rutina.resultado_entreno.duracion_minutos,
@@ -185,11 +186,11 @@ export class ClientDashboardComponent implements OnInit{
           this.selectedRoutine.resultado_entreno = resultado;
         }
         this.closeFeedbackModal();
-        alert('¡Feedback actualizado correctamente!');
+        alert('¡Feedback enviado correctamente!');
       },
       error: (error) => {
-        console.error('Error al actualizar el feedback', error);
-        alert('Error al actualizar el feedback. Por favor, inténtalo de nuevo');
+        console.error('Error al enviar el feedback', error);
+        alert('Error al enviar el feedback. Por favor, inténtalo de nuevo');
       }
       });
     } else {
@@ -218,6 +219,7 @@ export class ClientDashboardComponent implements OnInit{
   }
 
   formatDate(date: Date | string | undefined): string {
+    if (!date) return '';
     try {
       const d = new Date(date);
       if (isNaN(d.getTime())) return '';
