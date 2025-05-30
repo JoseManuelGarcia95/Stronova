@@ -1,36 +1,116 @@
-<!-- src/app/trainer-dashboard/trainer-dashboard.component.html -->
 <div class="min-h-screen bg-gray-50 py-6 px-4">
-    <div class="max-w-7xl mx-auto">
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Panel de Entrenador</h1>
-        <p class="mt-2 text-lg text-gray-600">
-          Bienvenido, {{ currentUser?.nombre }} {{ currentUser?.apellidos }}
-        </p>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white shadow rounded-lg p-6">
-          <h3 class="text-lg font-medium text-gray-900">Clientes Activos</h3>
-          <p class="text-3xl font-bold text-blue-600">{{ currentUser?.clientes_activos || 0 }}</p>
-        </div>
-        
-        <div class="bg-white shadow rounded-lg p-6">
-          <h3 class="text-lg font-medium text-gray-900">Especialidad</h3>
-          <p class="text-xl text-gray-700">{{ currentUser?.especialidad || 'No definida' }}</p>
-        </div>
-        
-        <div class="bg-white shadow rounded-lg p-6">
-          <h3 class="text-lg font-medium text-gray-900">Estado</h3>
-          <p class="text-xl text-green-600">Activo</p>
-        </div>
-      </div>
-      
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Header (mantenemos tu estructura original) -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Panel de Entrenador</h1>
+      <p class="mt-2 text-lg text-gray-600">
+        Bienvenido, {{ currentUser?.nombre }} {{ currentUser?.apellidos }}
+      </p>
+    </div>
+
+    <!-- Stats Cards (mantenemos tu estructura original) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <div class="bg-white shadow rounded-lg p-6">
-        <button 
-          (click)="logout()"
-          class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-          Cerrar Sesión
-        </button>
+        <h3 class="text-lg font-medium text-gray-900">Clientes Activos</h3>
+        <p class="text-3xl font-bold text-blue-600">{{ currentUser?.clientes_activos || 0 }}</p>
+      </div>
+      <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900">Especialidad</h3>
+        <p class="text-xl text-gray-700">{{ currentUser?.especialidad || 'No definida' }}</p>
+      </div>
+      <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900">Estado</h3>
+        <p class="text-xl text-green-600">Activo</p>
       </div>
     </div>
+
+    <!-- NUEVA SECCIÓN: Tarjetas de Navegación -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Gestión de Entrenamientos</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <div *ngFor="let card of navigationCards" 
+             (click)="navigateTo(card.route)"
+             class="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105">
+          
+          <!-- Icono y color de la tarjeta -->
+          <div [class]="card.color + ' ' + card.hoverColor" 
+               class="h-16 rounded-t-lg flex items-center justify-center transition-colors">
+            <svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <g [innerHTML]="getIconSvg(card.icon)"></g>
+            </svg>
+          </div>
+          
+          <!-- Contenido de la tarjeta -->
+          <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ card.title }}</h3>
+            <p class="text-sm text-gray-600 mb-4">{{ card.description }}</p>
+            
+            <!-- Botón de acción -->
+            <div class="flex justify-end">
+              <span class="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                Ir →
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sección de acceso rápido -->
+    <div class="bg-white shadow rounded-lg p-6 mb-8">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Acceso Rápido</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <button 
+          (click)="navigateTo('/trainer/clients')"
+          class="flex items-center justify-center px-4 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
+          <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+          </svg>
+          <span class="text-sm font-medium">Ver Clientes</span>
+        </button>
+
+        <button 
+          (click)="navigateTo('/trainer/create-routine')"
+          class="flex items-center justify-center px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors">
+          <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span class="text-sm font-medium">Nueva Rutina</span>
+        </button>
+
+        <button 
+          (click)="navigateTo('/trainer/routines')"
+          class="flex items-center justify-center px-4 py-3 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors">
+          <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          </svg>
+          <span class="text-sm font-medium">Mis Rutinas</span>
+        </button>
+
+        <button 
+          (click)="navigateTo('/trainer/stats')"
+          class="flex items-center justify-center px-4 py-3 bg-orange-50 text-orange-700 rounded-lg hover:bg-orange-100 transition-colors">
+          <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <span class="text-sm font-medium">Estadísticas</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Logout (mantenemos tu estructura original) -->
+    <div class="bg-white shadow rounded-lg p-6">
+      <button
+        (click)="logout()"
+        class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+        Cerrar Sesión
+      </button>
+    </div>
+
   </div>
+</div>
