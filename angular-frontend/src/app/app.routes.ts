@@ -25,6 +25,11 @@ export const routes: Routes = [
         path: 'rutina-detalle/:id',
         loadComponent: () => import('./components/rutina-detalle/rutina-detalle.component').then(m => m.RutinaDetalleComponent),
         canActivate: [ClientGuard]
+    },
+    {
+        path: 'trainer/clients',
+        loadComponent: () => import('./trainer/trainer-clients/trainer-clients.component').then(m => m.TrainerClientsComponent),
+        canActivate: [TrainerGuard]
     }, 
     {
         path: '', 
