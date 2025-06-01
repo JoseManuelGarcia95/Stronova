@@ -1,0 +1,299 @@
+<div class="min-h-screen bg-gray-50 py-6 px-4">
+    <div class="max-w-7xl mx-auto">
+      
+      <!-- Header -->
+      <div class="mb-6">
+        <button 
+          (click)="goBackToDashboard()"
+          class="flex items-center text-blue-600 hover:text-blue-800 mb-4 transition-colors">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Volver al Dashboard
+        </button>
+        
+        <div class="flex justify-between items-center">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">Gestión de Clientes</h1>
+            <p class="mt-2 text-gray-600">Administra tus clientes y asigna nuevos usuarios</p>
+          </div>
+          <button 
+            (click)="openAssignModal()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Asignar Cliente
+          </button>
+        </div>
+      </div>
+  
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p class="mt-4 text-gray-500">Cargando clientes...</p>
+      </div>
+  
+      <!-- Error -->
+      <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center mb-6">
+        <p class="text-red-700 font-medium">{{ error }}</p>
+        <button 
+          (click)="loadClientsData()"
+          class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+          Reintentar
+        </button>
+      </div>
+  
+      <!-- Content -->
+      <div *ngIf="!loading && !error">
+        
+        <!-- Filters and Search -->
+        <div class="bg-white shadow rounded-lg p-6 mb-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Filtros y Búsqueda</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Search -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
+              <input
+                type="text"
+                [(ngModel)]="searchTerm"
+                placeholder="Nombre, apellidos o email..."
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <!-- Filter by Objective -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Objetivo</label>
+              <select
+                [(ngModel)]="filterByObjective"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Todos los objetivos</option>
+                <option *ngFor="let objective of availableObjectives" [value]="objective">{{ objective }}</option>
+              </select>
+            </div>
+            
+            <!-- Filter by Gender -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Género</label>
+              <select
+                [(ngModel)]="filterByGender"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Todos</option>
+                <option value="masculino">Masculino</option>
+                <option value="femenino">Femenino</option>
+                <option value="otro">Otro</option>
+              </select>
+            </div>
+            
+            <!-- Clear Filters -->
+            <div class="flex items-end">
+              <button
+                (click)="clearFilters()"
+                class="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">
+                Limpiar Filtros
+              </button>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="bg-white shadow rounded-lg p-6">
+            <h3 class="text-lg font-medium text-gray-900">Mis Clientes</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ myClients.length }}</p>
+          </div>
+          <div class="bg-white shadow rounded-lg p-6">
+            <h3 class="text-lg font-medium text-gray-900">Usuarios Sin Asignar</h3>
+            <p class="text-3xl font-bold text-green-600">{{ unassignedUsers.length }}</p>
+          </div>
+          <div class="bg-white shadow rounded-lg p-6">
+            <h3 class="text-lg font-medium text-gray-900">Clientes Activos</h3>
+            <p class="text-3xl font-bold text-purple-600">{{ myClients.length }}</p>
+          </div>
+        </div>
+  
+        <!-- Clients List -->
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">
+              Mis Clientes ({{ filteredClients.length }})
+            </h3>
+          </div>
+          
+          <div class="p-6">
+            <!-- Empty state -->
+            <div *ngIf="filteredClients.length === 0" class="text-center py-12">
+              <div class="text-gray-400 mb-4">
+                <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM9 9a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-medium text-gray-900 mb-2">No hay clientes</h3>
+              <p class="text-gray-500 mb-4">
+                {{ myClients.length === 0 ? 'No tienes clientes asignados aún' : 'No se encontraron clientes con los filtros aplicados' }}
+              </p>
+              <button 
+                (click)="openAssignModal()"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                Asignar Primer Cliente
+              </button>
+            </div>
+  
+            <!-- Clients grid -->
+            <div *ngIf="filteredClients.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div *ngFor="let client of filteredClients" 
+                   class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                
+                <!-- Client Header -->
+                <div class="flex justify-between items-start mb-4">
+                  <div class="flex-1">
+                    <h4 class="text-lg font-semibold text-gray-900 cursor-pointer hover:text-blue-600"
+                        (click)="openClientDetail(client)">
+                      {{ client.nombre }} {{ client.apellidos }}
+                    </h4>
+                    <p class="text-sm text-gray-600">{{ client.email }}</p>
+                  </div>
+                  
+                  <span [class]="getClientStatusClass(getClientStatus(client))"
+                        class="px-2 py-1 rounded text-xs font-medium">
+                    {{ getClientStatus(client) }}
+                  </span>
+                </div>
+                
+                <!-- Client Info -->
+                <div class="space-y-2 mb-4">
+                  <div *ngIf="client.objetivo" class="flex justify-between">
+                    <span class="text-sm text-gray-500">Objetivo:</span>
+                    <span class="text-sm font-medium text-gray-900">{{ client.objetivo }}</span>
+                  </div>
+                  
+                  <div *ngIf="client.genero" class="flex justify-between">
+                    <span class="text-sm text-gray-500">Género:</span>
+                    <span class="text-sm font-medium text-gray-900">{{ client.genero }}</span>
+                  </div>
+                  
+                  <div class="flex justify-between">
+                    <span class="text-sm text-gray-500">BMI:</span>
+                    <span [class]="getBMIClass(getBMI(client))" class="text-sm font-medium">
+                      {{ getBMI(client) }}
+                    </span>
+                  </div>
+                  
+                  <div *ngIf="client.lesiones" class="mt-2">
+                    <p class="text-xs text-orange-600">
+                      <strong>Lesiones:</strong> {{ client.lesiones }}
+                    </p>
+                  </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="space-y-2">
+                  <button 
+                    (click)="createRoutineForClient(client)"
+                    class="w-full px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors">
+                    Crear Rutina
+                  </button>
+                  
+                  <div class="grid grid-cols-2 gap-2">
+                    <button 
+                      (click)="viewClientRoutines(client)"
+                      class="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
+                      Ver Rutinas
+                    </button>
+                    <button 
+                      (click)="unassignClient(client.id)"
+                      class="px-3 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors">
+                      Desasignar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal para asignar clientes -->
+  <div *ngIf="showAssignModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" (click)="closeAssignModal()">
+    <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white" (click)="$event.stopPropagation()">
+      <div class="mt-3">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Asignar Nuevo Cliente</h3>
+        
+        <!-- Search in modal -->
+        <div class="mb-4">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Buscar usuario..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        
+        <!-- Users list -->
+        <div class="max-h-60 overflow-y-auto mb-4">
+          <div *ngIf="filteredUnassignedUsers.length === 0" class="text-center py-4">
+            <p class="text-gray-500 text-sm">No hay usuarios disponibles</p>
+          </div>
+          
+          <div *ngFor="let user of filteredUnassignedUsers" 
+               class="flex justify-between items-center py-3 border-b border-gray-100 last:border-b-0">
+            <div>
+              <p class="font-medium text-gray-900">{{ user.nombre }} {{ user.apellidos }}</p>
+              <p class="text-xs text-gray-500">{{ user.email }}</p>
+              <p *ngIf="user.objetivo" class="text-xs text-blue-600">{{ user.objetivo }}</p>
+            </div>
+            <button 
+              (click)="assignClient(user.id)"
+              class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
+              Asignar
+            </button>
+          </div>
+        </div>
+        
+        <!-- Modal buttons -->
+        <div class="flex justify-end">
+          <button 
+            (click)="closeAssignModal()"
+            class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal de detalle del cliente -->
+  <div *ngIf="showClientDetailModal && selectedClient" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" (click)="closeClientDetail()">
+    <div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white" (click)="$event.stopPropagation()">
+      <div class="mt-3">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">
+          {{ selectedClient.nombre }} {{ selectedClient.apellidos }}
+        </h3>
+        
+        <div class="space-y-3">
+          <div><strong>Email:</strong> {{ selectedClient.email }}</div>
+          <div *ngIf="selectedClient.genero"><strong>Género:</strong> {{ selectedClient.genero }}</div>
+          <div *ngIf="selectedClient.objetivo"><strong>Objetivo:</strong> {{ selectedClient.objetivo }}</div>
+          <div *ngIf="selectedClient.altura"><strong>Altura:</strong> {{ selectedClient.altura }} cm</div>
+          <div *ngIf="selectedClient.peso_inicial"><strong>Peso inicial:</strong> {{ selectedClient.peso_inicial }} kg</div>
+          <div><strong>BMI:</strong> {{ getBMI(selectedClient) }}</div>
+          <div *ngIf="selectedClient.lesiones" class="bg-orange-50 p-3 rounded">
+            <strong class="text-orange-800">Lesiones:</strong>
+            <p class="text-orange-700 mt-1">{{ selectedClient.lesiones }}</p>
+          </div>
+        </div>
+        
+        <div class="flex justify-end space-x-2 mt-6">
+          <button 
+            (click)="closeClientDetail()"
+            class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors">
+            Cerrar
+          </button>
+          <button 
+            (click)="createRoutineForClient(selectedClient); closeClientDetail()"
+            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+            Crear Rutina
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
