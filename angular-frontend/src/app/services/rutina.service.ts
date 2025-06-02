@@ -90,4 +90,12 @@ export class RutinaService {
     getWorkoutResultById(resultadoId: number): Observable<ResultadoEntreno> {
         return this.http.get<ResultadoEntreno>(`${this.apiUrl}/resultado-entrenos/${resultadoId}`);
     }
+
+    // Crear rutinas con ejercicios
+    createRoutineWithExercises(routineData: any, exercises: any[]): Observable<any>{
+        return this.http.post<any>(`${this.apiUrl}/rutinas`, {
+            ...routineData,
+            ejercicios: exercises
+        });
+    }
 }
