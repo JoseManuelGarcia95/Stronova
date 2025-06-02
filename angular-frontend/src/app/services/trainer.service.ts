@@ -65,12 +65,12 @@ export class TrainerService {
 
     // Asignar usuario a entrenador
     assignUserToTrainer(trainerId: number, userId: number): Observable<Entrenador> {
-        return this.http.put<Entrenador>('${this.apiUrl}/entrenadores/${trainerId}/asignar-usuario/${userId}', {});
+        return this.http.put<Entrenador>(`${this.apiUrl}/entrenadores/${trainerId}/asignar-usuario/${userId}`, {});
     }
 
     // Desasignar usuario de entrenador
     unassignUserFromTrainer(trainerId: number, userId: number): Observable<Entrenador> {
-        return this.http.put<Entrenador>('${this.apiUrl}/entrenadores/${trainerId}/desasignar-usuario/${userId}', {});
+        return this.http.put<Entrenador>(`${this.apiUrl}/entrenadores/${trainerId}/desasignar-usuario/${userId}`, {});
     }
 
     // Buscar entrenadores por especialidad

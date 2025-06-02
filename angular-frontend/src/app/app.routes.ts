@@ -32,6 +32,11 @@ export const routes: Routes = [
         canActivate: [TrainerGuard]
     }, 
     {
+        path: 'trainer/create-routine',
+        loadComponent: () => import('./trainer/create-routine/create-routine.component').then(m => m.CreateRoutineComponent),
+        canActivate: [TrainerGuard]
+    },
+    {
         path: '', 
         redirectTo: '/login',
         pathMatch: 'full'
