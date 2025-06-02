@@ -87,7 +87,7 @@ export class TrainerRoutinesComponent implements OnInit {
             console.log('Rutinas cargadas:', this.allRoutines);
             this.allRoutines.forEach((routine, index) => {
                 console.log(`Rutina ${index}:`, routine);
-                if (!routine.usuario_id) {
+                if (!routine.usuarioId) {
                     console.warn(`Rutina ${routine.nombre} no tiene usuario_id`);
                 }
             });
@@ -116,7 +116,7 @@ export class TrainerRoutinesComponent implements OnInit {
                 routine.descripcion?.toLowerCase().includes(this.searchTerm.toLowerCase());
 
             const matchesClient = !this.filterByClient ||
-                routine.usuario_id.toString() === this.filterByClient;
+                routine.usuarioId?.toString() === this.filterByClient;
             
             const matchesType = !this.filterByType ||
                 routine.tipo_rutina === this.filterByType;
@@ -179,7 +179,7 @@ export class TrainerRoutinesComponent implements OnInit {
         this.router.navigate(['/trainer/create-routine'], {
             queryParams: {
                 duplicate: routine.id,
-                clientId: routine.usuario_id
+                clientId: routine.usuarioId
             }
         });
     }

@@ -195,7 +195,7 @@
                 <!-- Client Info -->
                 <div class="mb-4">
                   <p class="text-sm text-gray-500">
-                    <strong>Cliente:</strong> {{ routine.usuario_id ? getClientName(routine.usuario_id) : 'Sin cliente' }}
+                    <strong>Cliente:</strong> {{ routine.usuarioId ? getClientName(routine.usuarioId) : 'Sin cliente' }}
                   </p>
                 </div>
                 
@@ -257,7 +257,7 @@
                     </button>
                     <button 
                       (click)="duplicateRoutine(routine)"
-                      [disabled]="!routine.usuario_id"
+                      [disabled]="!routine.usuarioId"
                       class="px-2 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors">
                       Duplicar
                     </button>

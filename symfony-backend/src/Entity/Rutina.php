@@ -202,4 +202,18 @@ class Rutina
 
         return $this;
     }
+
+    // Obtener ID del usuario asignado
+    #[Groups(['rutina:read', 'usuario:read', 'entrenador:read'])]
+    public function getUsuarioId(): ?int
+    {
+        return $this->usuario ? $this->usuario->getId() : null;
+    }
+
+    // Obtener ID del entrenador
+    #[Groups(['rutina:read', 'usuario:read', 'entrenador:read'])]
+    public function getEntrenadorId(): ?int
+    {
+        return $this->entrenador ? $this->entrenador->getId() : null;
+    }
 }

@@ -28,6 +28,8 @@ export interface Rutina {
     id: number;
     entrenador_id: number;
     usuario_id: number;
+    usuarioId?: number;
+    entrenadorId?: number;
     nombre: string;
     tipo_rutina: string;
     series: number;
