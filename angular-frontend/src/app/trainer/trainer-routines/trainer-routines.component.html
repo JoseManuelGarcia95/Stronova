@@ -1,0 +1,312 @@
+<div class="min-h-screen bg-gray-50 py-6 px-4">
+    <div class="max-w-7xl mx-auto">
+      
+      <!-- Header -->
+      <div class="mb-6">
+        <button 
+          (click)="goBackToDashboard()"
+          class="flex items-center text-blue-600 hover:text-blue-800 mb-4 transition-colors">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Volver al Dashboard
+        </button>
+        
+        <div class="flex justify-between items-center">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">
+              {{ specificClient ? 'Rutinas de ' + specificClient.nombre + ' ' + specificClient.apellidos : 'Mis Rutinas' }}
+            </h1>
+            <p class="mt-2 text-gray-600">
+              {{ specificClient ? 'Gestiona las rutinas de este cliente' : 'Administra todas las rutinas que has creado' }}
+            </p>
+          </div>
+          <button 
+            (click)="createNewRoutine()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Nueva Rutina
+          </button>
+        </div>
+      </div>
+  
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p class="mt-4 text-gray-500">Cargando rutinas...</p>
+      </div>
+  
+      <!-- Error -->
+      <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center mb-6">
+        <p class="text-red-700 font-medium">{{ error }}</p>
+        <button 
+          (click)="loadData()"
+          class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+          Reintentar
+        </button>
+      </div>
+  
+      <!-- Content -->
+      <div *ngIf="!loading && !error">
+  
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+          <div class="bg-white shadow rounded-lg p-6">
+            <h3 class="text-lg font-medium text-gray-900">Total Rutinas</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ getTotalRoutines() }}</p>
+          </div>
+          <div class="bg-white shadow rounded-lg p-6">
+            <h3 class="text-lg font-medium text-gray-900">Pendientes</h3>
+            <p class="text-3xl font-bold text-yellow-600">{{ getPendingRoutines() }}</p>
+          </div>
+          <div class="bg-white shadow rounded-lg p-6">
+            <h3 class="text-lg font-medium text-gray-900">En Progreso</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ getActiveRoutines() }}</p>
+          </div>
+          <div class="bg-white shadow rounded-lg p-6">
+            <h3 class="text-lg font-medium text-gray-900">Completadas</h3>
+            <p class="text-3xl font-bold text-green-600">{{ getCompletedRoutines() }}</p>
+          </div>
+        </div>
+  
+        <!-- Filters -->
+        <div class="bg-white shadow rounded-lg p-6 mb-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Filtros y Búsqueda</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+            <!-- Search -->
+            <div class="lg:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+              <input
+                type="text"
+                [(ngModel)]="searchTerm"
+                (input)="applyFilters()"
+                placeholder="Nombre o descripción..."
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+            </div>
+            
+            <!-- Client Filter -->
+            <div *ngIf="!specificClient">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+              <select
+                [(ngModel)]="filterByClient"
+                (change)="applyFilters()"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <option value="">Todos los clientes</option>
+                <option *ngFor="let client of myClients" [value]="client.id">
+                  {{ client.nombre }} {{ client.apellidos }}
+                </option>
+              </select>
+            </div>
+            
+            <!-- Type Filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+              <select
+                [(ngModel)]="filterByType"
+                (change)="applyFilters()"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <option value="">Todos los tipos</option>
+                <option *ngFor="let type of availableTypes" [value]="type">{{ type }}</option>
+              </select>
+            </div>
+            
+            <!-- Category Filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+              <select
+                [(ngModel)]="filterByCategory"
+                (change)="applyFilters()"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <option value="">Todas las categorías</option>
+                <option *ngFor="let category of availableCategories" [value]="category">{{ category }}</option>
+              </select>
+            </div>
+            
+            <!-- Status Filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+              <select
+                [(ngModel)]="filterByStatus"
+                (change)="applyFilters()"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <option *ngFor="let status of statusOptions" [value]="status.value">{{ status.label }}</option>
+              </select>
+            </div>
+            
+            <!-- Clear Filters -->
+            <div class="flex items-end">
+              <button
+                (click)="clearFilters()"
+                class="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors text-sm">
+                Limpiar
+              </button>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Routines List -->
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">
+              Rutinas ({{ filteredRoutines.length }})
+            </h3>
+          </div>
+          
+          <div class="p-6">
+            <!-- Empty state -->
+            <div *ngIf="filteredRoutines.length === 0" class="text-center py-12">
+              <div class="text-gray-400 mb-4">
+                <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-medium text-gray-900 mb-2">No hay rutinas</h3>
+              <p class="text-gray-500 mb-4">
+                {{ allRoutines.length === 0 ? 'No has creado rutinas aún' : 'No se encontraron rutinas con los filtros aplicados' }}
+              </p>
+              <button 
+                (click)="createNewRoutine()"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                Crear Primera Rutina
+              </button>
+            </div>
+  
+            <!-- Routines grid -->
+            <div *ngIf="filteredRoutines.length > 0" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div *ngFor="let routine of filteredRoutines" 
+                   class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                
+                <!-- Routine Header -->
+                <div class="flex justify-between items-start mb-4">
+                  <div class="flex-1">
+                    <h4 class="text-lg font-semibold text-gray-900 cursor-pointer hover:text-blue-600"
+                        (click)="viewRoutineDetail(routine)">
+                      {{ routine.nombre }}
+                    </h4>
+                    <p class="text-sm text-gray-600 mt-1">{{ routine.descripcion }}</p>
+                  </div>
+                  
+                  <span [ngClass]="getRoutineStatusClass(routine)"
+                        class="px-2 py-1 rounded text-xs font-medium">
+                    {{ getRoutineStatusText(routine) }}
+                  </span>
+                </div>
+                
+                <!-- Client Info -->
+                <div class="mb-4">
+                  <p class="text-sm text-gray-500">
+                    <strong>Cliente:</strong> {{ routine.usuario_id ? getClientName(routine.usuario_id) : 'Sin cliente' }}
+                  </p>
+                </div>
+                
+                <!-- Routine Info -->
+                <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+                  <div>
+                    <span class="text-gray-500">Tipo:</span>
+                    <span class="ml-1 font-medium">{{ routine.tipo_rutina }}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500">Categoría:</span>
+                    <span class="ml-1 font-medium">{{ routine.categoria }}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500">Series:</span>
+                    <span class="ml-1 font-medium">{{ routine.series }}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500">Ejercicios:</span>
+                    <span class="ml-1 font-medium">{{ getExerciseCount(routine) }}</span>
+                  </div>
+                </div>
+                
+                <!-- Progress Info -->
+                <div *ngIf="routine.resultado_entreno" class="mb-4 p-3 bg-gray-50 rounded-lg">
+                  <div class="text-sm">
+                    <div class="flex justify-between mb-2">
+                      <span class="text-gray-500">Realizada:</span>
+                      <span class="font-medium">{{ formatDate(routine.resultado_entreno.fecha) }}</span>
+                    </div>
+                    <div *ngIf="routine.resultado_entreno.duracion_minutos" class="flex justify-between mb-2">
+                      <span class="text-gray-500">Duración:</span>
+                      <span class="font-medium">{{ routine.resultado_entreno.duracion_minutos }} min</span>
+                    </div>
+                    <div *ngIf="routine.resultado_entreno.dificultad_percibida" class="flex justify-between mb-2">
+                      <span class="text-gray-500">Dificultad:</span>
+                      <span class="font-medium">{{ routine.resultado_entreno.dificultad_percibida }}/5</span>
+                    </div>
+                    <div *ngIf="routine.resultado_entreno.comentarios" class="mt-2">
+                      <span class="text-gray-500">Feedback:</span>
+                      <p class="text-xs text-gray-700 mt-1 italic">{{ routine.resultado_entreno.comentarios }}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="space-y-2">
+                  <button 
+                    (click)="viewRoutineDetail(routine)"
+                    class="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
+                    Ver Detalle
+                  </button>
+                  
+                  <div class="grid grid-cols-3 gap-2">
+                    <button 
+                      (click)="editRoutine(routine)"
+                      class="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors">
+                      Editar
+                    </button>
+                    <button 
+                      (click)="duplicateRoutine(routine)"
+                      [disabled]="!routine.usuario_id"
+                      class="px-2 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors">
+                      Duplicar
+                    </button>
+                    <button 
+                      (click)="openDeleteModal(routine)"
+                      class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors">
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal de confirmación para eliminar -->
+  <div *ngIf="showDeleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" (click)="closeDeleteModal()">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white" (click)="$event.stopPropagation()">
+      <div class="mt-3">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+          <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </div>
+        
+        <h3 class="text-lg font-medium text-gray-900 text-center mb-2">
+          Eliminar Rutina
+        </h3>
+        
+        <p class="text-sm text-gray-500 text-center mb-4">
+          ¿Estás seguro de que quieres eliminar la rutina "{{ selectedRoutine?.nombre }}"? 
+          Esta acción no se puede deshacer.
+        </p>
+        
+        <div class="flex justify-center space-x-4">
+          <button 
+            (click)="closeDeleteModal()"
+            class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors">
+            Cancelar
+          </button>
+          <button 
+            (click)="confirmDelete()"
+            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -71,6 +71,11 @@ export class RutinaService {
         return this.http.get<Rutina>(`${this.apiUrl}/rutinas/${rutinaId}`);
     }
 
+    // Obtener las rutinas por entrenador
+    getRoutinesByTrainer(trainerId: number): Observable<Rutina[]> {
+        return this.http.get<Rutina[]>(`${this.apiUrl}/rutinas/buscar/entrenador/${trainerId}`);
+    }
+
     // Crear resultado de entrenamiento
     createWorkoutResult(resultado: Partial<ResultadoEntreno>): Observable<ResultadoEntreno> {
         return this.http.post<ResultadoEntreno>(`${this.apiUrl}/resultado-entrenos`, resultado);
@@ -97,5 +102,15 @@ export class RutinaService {
             ...routineData,
             ejercicios: exercises
         });
+    }
+
+    // Actualizar rutina
+    updateRoutine(rutinaId: number, routineData: any): Observable<Rutina> {
+        return this.http.put<Rutina>(`${this.apiUrl}/rutinas/${rutinaId}`, routineData);
+    }
+
+    // Eliminar rutina
+    deleteRoutine(rutinaId: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/rutinas/${rutinaId}`);
     }
 }
