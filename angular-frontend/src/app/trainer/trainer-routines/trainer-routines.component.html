@@ -215,7 +215,9 @@
                   </div>
                   <div>
                     <span class="text-gray-500">Ejercicios:</span>
-                    <span class="ml-1 font-medium">{{ getExerciseCount(routine) }}</span>
+                    <span class="ml-1 font-medium">
+                      {{ routine.rutinaEjercicios ? routine.rutinaEjercicios.length: 'Ver Detalles' }}
+                    </span>
                   </div>
                 </div>
                 
