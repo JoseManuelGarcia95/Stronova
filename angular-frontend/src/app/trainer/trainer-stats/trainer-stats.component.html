@@ -1,0 +1,201 @@
+<div class="min-h-screen bg-gray-50 py-6 px-4">
+    <div class="max-w-7xl mx-auto">
+      
+      <!-- Header -->
+      <div class="mb-6">
+        <button 
+          (click)="goBackToDashboard()"
+          class="flex items-center text-blue-600 hover:text-blue-800 mb-4 transition-colors">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Volver al Dashboard
+        </button>
+        
+        <div class="flex justify-between items-center">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">Estadísticas</h1>
+            <p class="mt-2 text-gray-600">Progreso y análisis de entrenamientos</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p class="mt-4 text-gray-500">Cargando estadísticas...</p>
+      </div>
+  
+      <!-- Error -->
+      <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center mb-6">
+        <p class="text-red-700 font-medium">{{ error }}</p>
+        <button 
+          (click)="loadData()"
+          class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+          Reintentar
+        </button>
+      </div>
+  
+      <!-- Content -->
+      <div *ngIf="!loading && !error">
+  
+        <!-- Overview Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div *ngFor="let card of statCards" 
+               class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center"
+                     [ngClass]="'bg-' + card.color + '-100'">
+                  <span class="text-2xl">{{ card.icon }}</span>
+                </div>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">{{ card.title }}</p>
+                <p class="text-3xl font-bold" [ngClass]="'text-' + card.color + '-600'">{{ card.value }}</p>
+                <p class="text-xs text-gray-400">{{ card.subtitle }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          
+          <!-- Rutinas por Estado -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">Rutinas por Estado</h3>
+            <div class="space-y-4">
+              <div *ngFor="let item of rutinasByStatus" class="flex items-center justify-between">
+                <div class="flex items-center flex-1">
+                  <div class="w-4 h-4 rounded-full mr-3" [style.background-color]="item.color"></div>
+                  <span class="text-sm font-medium text-gray-700">{{ item.label }}</span>
+                </div>
+                <div class="flex items-center ml-4">
+                  <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                    <div class="h-2 rounded-full transition-all duration-500" 
+                         [style.background-color]="item.color"
+                         [style.width.%]="item.percentage"></div>
+                  </div>
+                  <span class="text-sm font-bold text-gray-900 w-8 text-right">{{ item.value }}</span>
+                  <span class="text-xs text-gray-500 ml-1">({{ item.percentage }}%)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Rutinas por Tipo -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">Rutinas por Tipo</h3>
+            <div class="space-y-4">
+              <div *ngFor="let item of rutinasByType" class="flex items-center justify-between">
+                <div class="flex items-center flex-1">
+                  <div class="w-4 h-4 rounded-full mr-3" [style.background-color]="item.color"></div>
+                  <span class="text-sm font-medium text-gray-700">{{ item.label }}</span>
+                </div>
+                <div class="flex items-center ml-4">
+                  <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                    <div class="h-2 rounded-full transition-all duration-500" 
+                         [style.background-color]="item.color"
+                         [style.width.%]="item.percentage"></div>
+                  </div>
+                  <span class="text-sm font-bold text-gray-900 w-8 text-right">{{ item.value }}</span>
+                  <span class="text-xs text-gray-500 ml-1">({{ item.percentage }}%)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+        </div>
+  
+        <!-- Second Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          
+          <!-- Rutinas por Categoría -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">Rutinas por Categoría</h3>
+            <div class="space-y-4">
+              <div *ngFor="let item of rutinasByCategory" class="flex items-center justify-between">
+                <div class="flex items-center flex-1">
+                  <div class="w-4 h-4 rounded-full mr-3" [style.background-color]="item.color"></div>
+                  <span class="text-sm font-medium text-gray-700">{{ item.label }}</span>
+                </div>
+                <div class="flex items-center ml-4">
+                  <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                    <div class="h-2 rounded-full transition-all duration-500" 
+                         [style.background-color]="item.color"
+                         [style.width.%]="item.percentage"></div>
+                  </div>
+                  <span class="text-sm font-bold text-gray-900 w-8 text-right">{{ item.value }}</span>
+                  <span class="text-xs text-gray-500 ml-1">({{ item.percentage }}%)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Actividad por Cliente -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">Rutinas por Cliente</h3>
+            <div class="space-y-4">
+              <div *ngFor="let item of clientsActivity" class="flex items-center justify-between">
+                <div class="flex items-center flex-1">
+                  <div class="w-4 h-4 rounded-full mr-3" [style.background-color]="item.color"></div>
+                  <span class="text-sm font-medium text-gray-700 truncate">{{ item.label }}</span>
+                </div>
+                <div class="flex items-center ml-4">
+                  <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                    <div class="h-2 rounded-full transition-all duration-500" 
+                         [style.background-color]="item.color"
+                         [style.width.%]="item.percentage"></div>
+                  </div>
+                  <span class="text-sm font-bold text-gray-900 w-8 text-right">{{ item.value }}</span>
+                  <span class="text-xs text-gray-500 ml-1">({{ item.percentage }}%)</span>
+                </div>
+              </div>
+              
+              <!-- Empty state -->
+              <div *ngIf="clientsActivity.length === 0" class="text-center py-8">
+                <div class="text-gray-400 mb-2">
+                  <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <p class="text-sm text-gray-500">No hay rutinas asignadas a clientes</p>
+              </div>
+            </div>
+          </div>
+  
+        </div>
+  
+        <!-- Summary Section -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Resumen General</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="text-center">
+              <div class="text-3xl font-bold text-blue-600">
+                {{ allRoutines.length > 0 ? ((statCards[1].value / allRoutines.length) * 100).toFixed(1) : 0 }}%
+              </div>
+              <p class="text-sm text-gray-500">Tasa de Finalización</p>
+            </div>
+            
+            <div class="text-center">
+              <div class="text-3xl font-bold text-green-600">
+                {{ myClients.length > 0 ? (allRoutines.length / myClients.length).toFixed(1) : 0 }}
+              </div>
+              <p class="text-sm text-gray-500">Rutinas por Cliente</p>
+            </div>
+            
+            <div class="text-center">
+              <div class="text-3xl font-bold text-purple-600">
+                {{ allRoutines.length > 0 ? (statCards[3].value / allRoutines.length).toFixed(1) : 0 }}
+              </div>
+              <p class="text-sm text-gray-500">Ejercicios por Rutina</p>
+            </div>
+            
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  </div>
