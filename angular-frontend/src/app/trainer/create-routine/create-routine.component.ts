@@ -5,6 +5,7 @@ import { FormsModule } from "@angular/forms";
 import { AuthService } from "../../services/auth.service";
 import { TrainerService, Usuario } from "../../services/trainer.service";
 import { RutinaService } from "../../services/rutina.service";
+import { subscribeOn } from "rxjs";
 
 interface ExerciseForm {
     ejercicio_id?: number;
@@ -43,6 +44,7 @@ export class CreateRoutineComponent implements OnInit {
 
     loading = false;
     saving = false;
+    isEditing = false;
     error: string | null = null;
     success: string | null = null;
 
@@ -77,6 +79,14 @@ export class CreateRoutineComponent implements OnInit {
 
     ngOnInit(): void {
         this.currentTrainer = this.authService.getCurrentUser();
+
+        // Verificar si es edición o creación
+        const routineId = this.route.snapshot.params['id'];
+        if (routineId) {
+            this.isEditing = true;
+            this.loadRoutineForEdit(routineId);
+        }
+
         this.route.queryParams.subscribe(params => {
             const clientId = params['clientId'];
             if (clientId) {
@@ -315,5 +325,25 @@ export class CreateRoutineComponent implements OnInit {
         this.currentStep = 1;
         this.error = null;
         this.success = null;
+    }
+
+    loadRoutineForEdit(routineId: number): void {
+        this.rutinaService.getRoutineById(routineId).subscribe ({
+            next: (routine) => {
+                this.routineForm = {
+                    nombre: routine.nombre,
+                    tipo_rutina: routine.tipo_rutina,
+                    categoria: routine.categoria,
+                    descripcion: routine.descripcion,
+                    series: routine.series,
+                    usuario_id: routine.usuario_id || routine.usuarioId || 0,
+                    ejercicios: routine.rutinaEjercicios || []
+                };
+            },
+            error: (error) => {
+                console.error('Error loading routine:', error);
+                this.error = 'Error al cargar la rutina';
+            }
+        });
     }
 }

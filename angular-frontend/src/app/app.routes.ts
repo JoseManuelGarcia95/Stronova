@@ -23,8 +23,7 @@ export const routes: Routes = [
     }, 
     {
         path: 'rutina-detalle/:id',
-        loadComponent: () => import('./components/rutina-detalle/rutina-detalle.component').then(m => m.RutinaDetalleComponent),
-        canActivate: [ClientGuard]
+        loadComponent: () => import('./components/rutina-detalle/rutina-detalle.component').then(m => m.RutinaDetalleComponent)
     },
     {
         path: 'trainer/clients',
@@ -46,6 +45,11 @@ export const routes: Routes = [
         loadComponent: () => import('./trainer/trainer-stats/trainer-stats.component').then(m => m.TrainerStatsComponent),
         canActivate: [TrainerGuard]
     }, 
+    {
+        path: 'trainer/edit-routine/:id',
+        loadComponent: () => import('./trainer/create-routine/create-routine.component').then(m => m.CreateRoutineComponent),
+        canActivate: [TrainerGuard]
+    },
     {
         path: '', 
         redirectTo: '/login',
